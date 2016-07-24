@@ -1,0 +1,168 @@
+<ul class="nav nav-tabs">
+  <li role="presentation"><a data-pjax href="${list_url}">List</a></li>
+  <li role="presentation" class="active"><a href="#">${nav_title}</a></li>
+</ul>
+<h3>${title}</h3>
+<form id="myform" class="form-horizontal" method="POST" form-pjax action="">
+  ${optips if optips else ""}
+  ${"<input type='hidden' value='%d' name='id'>"%id if type(id) == int else ""}
+  <div class="form-group ${"has-error" if "country" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Country</label>
+    <div class="col-sm-10">
+      <select id="country" multiple="multiple" class="content-widget" data-placeholder="Select country...">
+            %for n,val, _ in options['country']:
+                <option value="${val}" }>${n}</option>
+            %endfor
+      </select>
+      <input id="country_input" type='hidden' name="country" disabled>
+      ${"<p class='text-danger'->%s</p>"%tips['country'] if "country" in tips else ""}
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "os" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">OS</label>
+    <div class="col-sm-10">
+      <select id="os" multiple="multiple" class="content-widget" data-placeholder="Select OS...">
+            %for n,val in options['os']:
+                <option value="${val}" }>${n}</option>
+            %endfor
+      </select>
+      <input id="os_input" type='hidden' name="os" disabled>
+      ${"<p class='text-danger'->%s</p>"%tips['os'] if "os" in tips else ""}
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "browser" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Browser</label>
+    <div class="col-sm-10">
+      <select id="browser" multiple="multiple" class="content-widget" data-placeholder="Select browser...">
+            %for n,val in options['browser']:
+                <option value="${val}" }>${n}</option>
+            %endfor
+      </select>
+      <input id="browser_input" type='hidden' name="browser" disabled>
+      ${"<p class='text-danger'->%s</p>"%tips['browser'] if "browser" in tips else ""}
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "status" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Status</label>
+    <div class="col-sm-10">
+      <label class="radio-inline">
+          <input type="radio" name="status" value="0" ${'checked' if not status or status==0 else ''}> off
+        </label>
+        <label class="radio-inline">
+          <input type="radio" name="status" value="1" ${'checked' if status and status==1 else ''}> on
+      </label>
+      ${"<p class='text-danger'->%s</p>"%tips['status'] if "status" in tips else ""}
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "max_bid" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Max Bid</label>
+    <div class="col-sm-10">
+      <input name="max_bid" id="max_bid" value="${max_bid if max_bid else 0}" style="max-width:300px;width:100%"/>
+      ${"<p class='text-danger'->%s</p>"%tips['max_bid'] if "max_bid" in tips else ""}
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "wid" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Website</label>
+    <div class="col-sm-10">
+      <select id="wid" multiple="multiple" class="content-widget" data-placeholder="Select website id...">
+            %for wid,name in options['wid']:
+                <option value="${wid}" }>${name}</option>
+            %endfor
+      </select>
+      <input id="wid_input" type='hidden' name="wid" disabled>
+      ${"<p class='text-danger'->%s</p>"%tips['wid'] if "wid" in tips else ""}
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="button" id="mysmt" class="btn btn-default">Submit</button>
+    </div>
+  </div>
+</form>
+
+<script>
+    $(document).ready(function() {
+        var country_select = $("#country").kendoMultiSelect({
+            autoClose:false,
+            change:function () {
+                if(this.value().indexOf("GLOBAL") != -1)
+                   this.value("GLOBAL");
+            }
+        }).data("kendoMultiSelect");
+        var os_select = $("#os").kendoMultiSelect({
+            autoClose:false,
+            change:function () {
+                if(this.value().indexOf("All") != -1)
+                   this.value("All");
+            }
+        }).data("kendoMultiSelect");
+
+
+        var browser_select = $("#browser").kendoMultiSelect({
+            autoClose:false,
+            change:function () {
+                if(this.value().indexOf("All") != -1)
+                   this.value("All");
+            }
+        }).data("kendoMultiSelect");
+
+        var wid_select = $("#wid").kendoDropDownList({
+            filter: "contains",
+            change:function () {
+                if(this.value().indexOf("All") != -1)
+                   this.value("All");
+            }
+        }).data("kendoDropDownList");
+
+        $("#max_bid").kendoNumericTextBox({
+            min: 0,
+            step: 0.01,
+        });
+        $("#daily_budget").kendoNumericTextBox({
+            min: 0,
+            step: 0.01,
+        });
+
+
+        %if country:
+            country_select.value("${country}".split(";"));
+        %endif
+        %if os:
+            os_select.value("${os}".split(";"));
+        %endif
+        %if browser:
+            browser_select.value("${browser}".split(";"));
+        %endif
+
+        $("#mysmt").click(function() {
+            var country_val = country_select.value(),
+                wid_val = wid_select.value(),
+                os_val = os_select.value(),
+                browser_val = browser_select.value();
+
+            if(wid_val.length > 0) {
+                $("input[name=wid]").removeAttr("disabled");
+                $("input[name=wid]").val(wid_val);
+            }
+
+            if(country_val.length > 0){
+                $("input[name=country]").removeAttr("disabled");
+                $("input[name=country]").val(country_val.join(";"));
+            }
+            if(os_val.length > 0){
+                $("input[name=os]").removeAttr("disabled");
+                $("input[name=os]").val(os_val.join(";"));
+            }
+            if(browser_val.length > 0){
+                $("input[name=browser]").removeAttr("disabled");
+                $("input[name=browser]").val(browser_val.join(";"));
+            }
+            $("#myform").submit();
+        });
+
+        var tabs = $("a[data-pjax]");
+        initPjaxTag(tabs, "#content-inner");
+        var forms = $("form[form-pjax]");
+        initPjaxForm(forms, "#content-inner");
+    })
+</script>

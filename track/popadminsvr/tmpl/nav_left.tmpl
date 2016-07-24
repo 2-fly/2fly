@@ -1,0 +1,82 @@
+<div class="col-xs-12 nav-left">
+    <div class="nav-default">
+        <button id="toggle-button" type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+    </div>
+    <h1 id="dash-logo" class="center-block">Dsp·Massival</h1>
+    <div id="nav-div" class="navbar-collapse collapse in">
+    </div>
+</div>
+<script type="text/javascript">
+    var nav_str = '<ul id="nav">\
+        % for item in nav_left:
+        %if item.get('href'):
+            <li><div class="bg ${"li-active-bg" if item['act'] else "li-bg"}"\
+             <a href="${item['href']}"><img src="${item['img']}"></img>${item['name']}</a>\
+             </div></li>\
+        %else:
+            <li class="k-state-active"><img src="${item['img']}"></img>${item['name']}\
+                % for i in item['items']:
+                <div><div class="bg ${"li-active-bg" if i['act'] else "li-bg"}"><div class="li-content"><a href="${i['url']}">${i['name']} </a></div></div></div>\
+                % endfor
+            </li>\
+        %endif
+        % endfor
+    </ul>'
+    $(document).ready( function() {
+        $("#nav-div").append(nav_str);
+        $("#nav").kendoPanelBar();
+
+        var b = new myAjax("#content-inner");
+        $("#nav a").each(function(indx, v) {
+            var href = $(v).attr("href");
+            if(!href) {
+                return;
+            }
+            $(v).click(function() {
+                b.ajax($(this).attr("href"));
+                var li = $(v).closest("ul").find(".li-active-bg");
+                li.removeClass('li-active-bg');
+                li.addClass("li-bg");
+                var cur_bg = $(v).closest(".bg");
+                cur_bg.removeClass("li-bg");
+                cur_bg.addClass("li-active-bg");
+                return false;
+            });
+
+         })
+        history.pushState({html:$("#content-inner").html()}, document.title, window.location.href);
+        window.addEventListener("popstate", function(e) {
+            if(e.state&& typeof(e.state.html) == "string")
+                $("#content-inner").html(e.state.html);
+        });
+   });
+</script>
+<style>
+    #toggle-button {margin-top:16px;}
+    #nav,#nav .k-item, #nav .k-state-active, #nav .k-state-highlight, #nav .k-content, #nav .k-panelbar .k-item,#nav .k-header, #nav .k-widget{background-color:transparent;line-height:inherit}
+    #nav .k-header{padding:0 2em}
+    #nav { border:none}
+    #nav li {clear:both}
+    #nav *{ font-size:16px;color:#fff}
+    #nav .k-image { margin-top:12px!important; margin-right:10px!important;}
+    #nav .k-header { box-shadow:none!important;height:65px;line-height:65px;border-bottom:1px solid #4a4b51;color:#b8bbc2!important;border-top:none;border-left:none;border-right:none;}
+    #nav .k-content {border-bottom:1px solid #4a4b51;}
+    #nav .bg {height:65px;color:#fff;line-height:65px }
+    #nav .li-active-bg {background-color:#000;}
+    #nav .li-bg:hover{background-color:#212329}
+    #nav .k-state-hover{background-color:#212329}
+    #nav .k-content .li-content{ margin-left:35px;border-left:1px solid #4a4b51;height:100%}
+    #nav .k-content a{padding-left:20px;color:#b8bbc2!important; width:100%; height:100%;text-decoration:none;display:block;line-height:inherit}
+    #nav-div ul{height:auto;}
+    #nav .k-i-arrow-n, #nav .k-i-arrow-s {right:2em;margin-top:-6px;width:12px;height:12px;background-size:12px 12px;background-position:0% 0%;}
+    #nav .k-i-arrow-n {background-image:url("/assets/image/menu-fold.png")}
+    #nav .k-i-arrow-s {background-image:url("/assets/image/menu-unfold.png")}
+    #nav .k-i-arrow-n:before, #nav .k-i-arrow-s:before {content:""!important}
+    #dash-logo {font-size:16px; text-transform:uppercase;line-height: 22px;padding:22px 0;color:#fff;background-color:#1996e4;text-align:center;margin:0;}
+    .icon-bar {background-color:#fff}
+    #nav-div {padding:0px}
+</style>

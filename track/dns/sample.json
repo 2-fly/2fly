@@ -1,0 +1,89 @@
+{
+  "Comment": "A new record set for the zone.",
+  "Changes": [
+    {
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "\\052.xxxdomainxxx.",
+        "Type": "A",
+        "SetIdentifier": "california",
+        "Region": "us-west-1",
+        "AliasTarget": {
+          "HostedZoneId": "Z368ELLRRE2KJ0",
+          "DNSName": "dualstack.massival-1673027148.us-west-1.elb.amazonaws.com.",
+          "EvaluateTargetHealth": false
+        }
+      }
+    },
+    {
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "\\052.xxxdomainxxx.",
+        "Type": "A",
+        "SetIdentifier": "france",
+        "Region": "eu-central-1",
+        "AliasTarget": {
+          "HostedZoneId": "Z215JYRZR1TBD5",
+          "DNSName": "dualstack.massival-20280426.eu-central-1.elb.amazonaws.com.",
+          "EvaluateTargetHealth": false
+        }
+      }
+    },
+    {
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "\\052.xxxdomainxxx.",
+        "Type": "A",
+        "SetIdentifier": "japan",
+        "Region": "ap-northeast-1",
+        "AliasTarget": {
+            "HostedZoneId": "Z14GRHDCWA56QT",
+            "DNSName": "dualstack.massival-334443117.ap-northeast-1.elb.amazonaws.com.",
+            "EvaluateTargetHealth": false
+        }
+      }
+    },
+    {
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "\\052.xxxdomainxxx.",
+        "Type": "A",
+        "SetIdentifier": "brasil",
+        "Region": "sa-east-1",
+        "AliasTarget": {
+            "HostedZoneId": "Z2P70J7HTTTPLU",
+            "DNSName": "dualstack.massival-515692704.sa-east-1.elb.amazonaws.com.",
+            "EvaluateTargetHealth": false
+        }
+      }
+    },
+    {
+        "Action": "CREATE",
+        "ResourceRecordSet": {
+            "Name": "\\052.xxxdomainxxx.",
+            "Type": "A",
+            "SetIdentifier": "singapoure",
+            "Region": "ap-southeast-1",
+            "AliasTarget": {
+                "HostedZoneId": "Z1LMS91P8CMLE5",
+                "DNSName": "dualstack.massival-1273199092.ap-southeast-1.elb.amazonaws.com.",
+                "EvaluateTargetHealth": false
+            }
+        }
+    },
+    {
+        "Action": "CREATE",
+        "ResourceRecordSet": {
+            "Name": "\\052.xxxdomainxxx.",
+            "Type": "A",
+            "SetIdentifier": "Virginia",
+            "Region": "us-east-1",
+            "AliasTarget": {
+                "HostedZoneId": "Z35SXDOTRQ7X7K",
+                "DNSName": "dualstack.massival-1563297132.us-east-1.elb.amazonaws.com.",
+                "EvaluateTargetHealth": false
+            }
+        }
+    }
+  ]
+}

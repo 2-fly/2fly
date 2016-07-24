@@ -1,0 +1,52 @@
+<div class="nav-top">
+    <div>
+        <div class="nav-top-item-inner">
+            <div class="item-view">
+                <nav class="navbar navbar-default">
+                  <div class="container-fluid">
+                      <ul class="row nav navbar-nav navbar-right">
+                        <li class="dropdown" style="display:inline-block;position:relative;">
+                        <a id="acc_btn" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <img src="/assets/image/login-user-icon@2x.png"> ${username} <span class="caret"></span></a>
+                          <ul class="dropdown-menu">
+                            <li><a href="${edit_account}">Edit Account</a></li>
+                            <li><a href="${logout}">Logout</a></li>
+                          </ul>
+                        </li>
+                      </ul>
+                  </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.nav-top .navbar {margin-bottom:0px}
+</style>
+
+<script>
+    function MouseOverEvent($this) {
+        var selector = $this.attr('data-target')
+        if (!selector) {
+          selector = $this.attr('href')
+          selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
+        }
+
+        var $parent = selector && $(selector)
+
+        $parent = $parent && $parent.length ? $parent : $this.parent()
+        if(!$parent.hasClass('open')) {
+            $this.dropdown('toggle');
+        }
+    }
+
+    $("#adv_btn").mouseover(function() {
+        MouseOverEvent($(this));
+    })
+    $("#acc_btn").mouseover(function() {
+        MouseOverEvent($(this));
+    })
+    $("#pub_btn").mouseover(function() {
+        MouseOverEvent($(this));
+    })
+</script>

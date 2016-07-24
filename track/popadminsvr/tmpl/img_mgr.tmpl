@@ -1,0 +1,23 @@
+<!-- elfinder initialization  -->
+<script>
+    $(function() {
+        $('#elfinder').elfinder({
+            // Connector URL
+            url : '${op_url}',
+            onlyMimes: ["image"],
+            commands : [
+                'open', 'reload', 'home', 'up', 'back', 'forward', 'getfile',
+                'download', 'rm', 'rename', 'mkdir', 'upload',
+                'cut', 'search', 'info', 'view',
+                'resize', 'sort'
+            ],
+            // Callback when a file is double-clicked
+            getFileCallback : function(file) {
+                // ...
+            },
+            soundPath : "/assets/img_mgr/sounds",
+            transport : new elFinderSupportVer1(),
+        });
+    });
+</script>
+<div id="elfinder"></div>

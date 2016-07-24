@@ -1,0 +1,61 @@
+ <div class="row-fluid">
+    <ul class="nav nav-tabs">
+      ##<li>
+      ##    <a href="${list_url}" title="Event list">List</a>
+      ##</li>
+      <li>
+          <a href="${create_url}" title="Create new event">Policy</a>
+      </li>
+      <li class="active">
+          <a href="javascript:void(0)" title="Events Configs">Config</a>
+      </li>
+      <li>
+          <a href="${report_url}" title="Events Report">Report</a>
+      </li>
+    </ul>
+</div>
+
+<div class="row-fluid">
+    <form action="" method="POST" class="form-horizontal" id="flow_event" enctype="multipart/form-data">
+        <div class="control-group">
+            <label class="control-label"><strong>Emails</strong></label>
+            <div class="controls row-fluid">
+                <textarea type="text" id="email_list" style="width:700px;height:200px" onblur="checkEmail()">${email_list.replace(";", "\n")}</textarea>
+                <input name="email_list" type=hidden disable>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <input id="submit" type="submit" class="k-button btn-save" value="Submit">
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function checkEmail()
+    {
+        return true;
+        //var text = document.getElementById("email_list");
+        //var myreg = /^([a-zA-Z0-9]+[_|/_|/.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|/_|/.]?)*[a-zA-Z0-9]+/.[a-zA-Z]{2,3}$/;
+        //if (!myreg.test(text.value))
+        //{
+        //    alert("email format is error.");
+        //    return false;
+        //}
+        //return true;
+    }
+    $(document).ready(function() {
+        $("#submit").click(function() {
+            var text = handle_textarea($("#email_list").val())
+            $("[name=email_list]").val(text);
+       })
+    });
+
+    function handle_textarea(text) {
+        text = text.replace(/\r\n/g, ";");
+        text = text.replace(/\r/g, ";");
+        text = text.replace(/\n/g, ";");
+        return text
+    }
+</script>

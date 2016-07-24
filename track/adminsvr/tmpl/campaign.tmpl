@@ -1,0 +1,1033 @@
+<div class="row-fluid">
+    <ul class="nav nav-tabs">
+      <li>
+          <a href="${list_url}">List</a>
+      </li>
+      <li class="active">
+          <a href="javascript:void(0)">${title}</a>
+      </li>
+    </ul>
+</div>
+
+<div class="row-fluid">
+    <form action="" method="POST" class="form-horizontal" id="myform" enctype="multipart/form-data">
+        <div class="control-group">
+            ${op_tips}
+        </div>
+        %if type(id) == int:
+            <input id="campaign_id" value="${id}" name='id' type="hidden"/>
+        %endif
+
+        <div class="control-group">
+            <label class="control-label" for="name" class="control-label"><strong>name</strong></label>
+            <div class="controls">
+                <input id="name" autocomplete="off" name="name" type="text" value="${name if name else ""}">
+            </div>
+        </div>
+        ${tips['name'] if tips.get('name') else ""}
+
+        <div class="control-group">
+            <label class="control-label" for="uri"><strong>uri</strong></label>
+            <div class="controls">
+                <input id="uri" name="uri" type="text" value="${uri}" readonly>
+                <button id="clone" type="button" class="btn" data-clipboard-target="uri">copy uri</button>
+                <button id="clone-full" type="button" class="btn">copy full uri</button>
+                <input id="clone-full-input" type="hidden">
+            </div>
+        </div>
+        ${tips['uri'] if tips.get('uri') else ""}
+        <div class="control-group">
+            <label class="control-label" for="uri"><strong>track domain</strong></label>
+            <div class="controls">
+                <select id="track_domain" name="track_domain" class='flow-id'></select>
+                <input type="hidden" id='full-uri'>
+
+            </div>
+        </div>
+        ${tips['uri'] if tips.get('track_domain') else ""}
+
+
+        <div class="control-group">
+            <label class="control-label" for="country"><strong>country</strong></label>
+            <div class="controls">
+              <select id="country" name="country" value="${country if country else ''}" class="flow-id"></select>
+            </div>
+        </div>
+        ${tips['country'] if tips.get('country') else ""}
+
+        <div class="control-group">
+            <label class="control-label" for="cost"><strong>cost</strong></label>
+            <div class="controls">
+                <input id="cost" name="cost" type="text" value="${cost if cost else ""}">
+                %if title == "Edit":
+                <button class="btn" type="button" id="update_campaign_cost" onclick="open_updatepayout_modal()">update</button>
+                ${update_campaign_cost_tips if update_campaign_cost_tips else ""}
+                %endif
+            </div>
+        </div>
+        ${tips['cost'] if tips.get('cost') else ""}
+
+        <div class="control-group">
+            <label class="control-label"><strong>flow</strong></label>
+            <div class="controls">
+                <div class="row-fluid" id="flow-div">
+                    <select id="flow_id" name="flow_id" class="flow-id">
+                    </select>
+                    <button class="btn" type="button" id="create_flow">new flow</button>
+                    <button class="btn" type="button" id="edit_flow">edit flow</button>
+                    % if allow_switch_path:
+                    <button class="btn" type="button" id="switch_path">switch path</button>
+                    %endif
+                    <button class="k-button btn-save" title="check the campaign's country if match all offer's country belong it" type="button" id="check-offer">check offer</button>
+                    %if type(id) == int:
+                    <button class="k-button btn-save" title="check the campaign is valid" type="button" id="check-camp">check campaign</button>
+                    %endif
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label"><strong></strong></label>
+            <div class="controls">
+                <div id="check-offer-alert"></div>
+            </div>
+        </div>
+
+            <div class="control-group">
+                <label class="control-label"><strong>source id</strong></label>
+                <div class="controls">
+                <select id="source_id" class="flow-id"> </select>
+                <input id="source_id_input" name="source_id" class="flow-id" value=0 type="hidden">
+                <input id="admin_source_id_input" name="admin_source_id" class="flow-id" value=0 type="hidden">
+                </div>
+            </div>
+        ${tips['source_id'] if tips.get('source_id') else ""}
+              <div class="control-group">
+                    <label class="control-label" for="ck_cloak_on"><strong>ck cloak</strong></label>
+                    <div class="controls">
+                        <label class="radio inline">
+                            <input type="radio" class="k-radio" name="ck_cloak" id="ck_cloak_off" value="0" ${'checked' if not ck_cloak or ck_cloak==0 else ''}>
+                            <label class="k-radio-label" for="ck_cloak_off">off</label>
+                        </label>
+                        <label class="radio inline">
+                            <input type="radio" class="k-radio" name="ck_cloak" id="ck_cloak_on" value="1" ${'checked' if ck_cloak and ck_cloak==1 else ''}>
+                            <label class="k-radio-label" for="ck_cloak_on">on</label>
+                        </label>
+                    </div>
+              </div>
+        ${tips['ck_cloak'] if tips.get('ck_cloak') else ""}
+              <div class="control-group">
+                    <label class="control-label" for="ck_cloak_html"><strong>ck cloak html</strong></label>
+                    <div class="controls">
+                        <input id="ck_cloak_html" name='ck_cloak_html' type="text" ${'value="'+ck_cloak_html+'"' if ck_cloak and ck_cloak_html and ck_cloak == 1 else "readonly"}/>
+                    </div>
+              </div>
+        ${tips['ck_cloak_html'] if tips.get('ck_cloak_html') else ""}
+
+              <div class="control-group">
+                    <label class="control-label" for="ck_cloak_ts_html"><strong>ck cloak ts</strong></label>
+                    <div class="controls">
+                        <label class="radio inline">
+                            <input type="radio" class="k-radio" name="ck_cloak_ts" id="ck_cloak_ts_off" value="0" ${'checked' if not ck_cloak_ts or ck_cloak_ts==0 else ''}>
+                            <label class="k-radio-label" for="ck_cloak_ts_off">off</label>
+                        </label>
+                        <label class="radio inline">
+                            <input type="radio" class="k-radio" name="ck_cloak_ts" id="ck_cloak_ts_on" value="1" ${'checked' if ck_cloak_ts and ck_cloak_ts==1 else ''}>
+                            <label class="k-radio-label" for="ck_cloak_ts_on">on</label>
+                        </label>
+                    </div>
+              </div>
+              <div class="control-group">
+                    <label class="control-label" for="ck_cloak_html"><strong>ck cloak ts html</strong></label>
+                    <div class="controls">
+                        <input id="ck_cloak_ts_html" name='ck_cloak_ts_html' type="text" ${'value="'+ck_cloak_ts_html+'"' if ck_cloak_ts and ck_cloak_ts_html and ck_cloak_ts == 1 else "readonly"}/>
+                    </div>
+              </div>
+        ${tips['ck_cloak_ts_html'] if tips.get('ck_cloak_ts_html') else ""}
+
+              <div class="control-group">
+                    <label class="control-label" for="ck_cloak_ts_html2"><strong>ck cloak ts2</strong></label>
+                    <div class="controls">
+                        <label class="radio inline">
+                            <input type="radio" class="k-radio" name="ck_cloak_ts2" id="ck_cloak_ts_off2" value="0" ${'checked' if not ck_cloak_ts2 or ck_cloak_ts2==0 else ''}>
+                            <label class="k-radio-label" for="ck_cloak_ts_off2">off</label>
+                        </label>
+                        <label class="radio inline">
+                            <input type="radio" class="k-radio" name="ck_cloak_ts2" id="ck_cloak_ts_on2" value="1" ${'checked' if ck_cloak_ts2 and ck_cloak_ts2==1 else ''}>
+                            <label class="k-radio-label" for="ck_cloak_ts_on2">on</label>
+                        </label>
+                    </div>
+              </div>
+              <div class="control-group">
+                    <label class="control-label" for="ck_cloak_html2"><strong>ck cloak ts html2</strong></label>
+                    <div class="controls">
+                        <input id="ck_cloak_ts_html2" name='ck_cloak_ts_html2' type="text" ${'value="'+ck_cloak_ts_html2+'"' if ck_cloak_ts2 and ck_cloak_ts_html2 and ck_cloak_ts2 == 1 else "readonly"}/>
+                    </div>
+              </div>
+        ${tips['ck_cloak_ts_html2'] if tips.get('ck_cloak_ts_html2') else ""}
+
+              <div class="control-group">
+                    <label class="control-label" for="ck_android_html"><strong>ck orientation</strong></label>
+                <div class="controls">
+                        <label class="radio inline">
+                            <input type="radio" class="k-radio" name="ck_android" id="ck_android_off" value="0" ${'checked' if not ck_android or ck_android==0 else ''}>
+                            <label class="k-radio-label" for="ck_android_off">off</label>
+                        </label>
+                        <label class="radio inline">
+                            <input type="radio" name="ck_android" class="k-radio" id="ck_android_on" value="1" ${'checked' if ck_android and ck_android==1 else ''}>
+                            <label class="k-radio-label" for="ck_android_on">on</label>
+                        </label>
+                </div>
+              </div>
+              <div class="control-group">
+                    <label class="control-label" for="ck_cloak_html"><strong>ck orientation html</strong></label>
+                    <div class="controls">
+                      <input id="ck_android_html" name='ck_android_html' type="text" ${'value="'+ck_android_html+'"' if ck_android and ck_android == 1 else "readonly"}/>
+                    </div>
+              </div>
+        ${tips['ck_android_html'] if tips.get('ck_android_html') else ""}
+
+
+              <div class="control-group">
+                    <label class="control-label" for="ck_websiteid_digit"><strong>ck websiteid</strong></label>
+                <div class="controls">
+                    <div>
+                    <select id="website" multiple class="multiselect" style="width:220px;">
+                        <option value="ck_websiteid_digit">digit</option>
+                        <option value="ck_websiteid_typo">typo</option>
+                    </select>
+                    <input id="ck_websiteid_digit" name="ck_websiteid_digit" style="display:none" value="${ck_websiteid_digit if ck_websiteid_digit else 0}"/>
+                    <input id="ck_websiteid_typo" name="ck_websiteid_typo" style="display:none" value="${ck_websiteid_typo if ck_websiteid_typo else 0}"/>
+                    </div>
+                </div>
+              </div>
+
+              <div class="control-group">
+                    <label class="control-label" for="ck_websiteid_html"><strong>ck websiteid_html</strong></label>
+                <div class="controls">
+                  <input id="ck_websiteid_html" name="ck_websiteid_html" type="text"  ${ 'value="'+ck_websiteid_html+'"' if (ck_websiteid_digit and ck_websiteid_digit==1) or (ck_websiteid_typo and ck_websiteid_typo==1) else 'value="" readonly'}>
+                </div>
+              </div>
+            ${tips['ck_websiteid_html'] if tips.get('ck_websiteid_html') else ""}
+
+            <div class="control-group">
+                    <label class="control-label" for="ck_cloak_on"><strong>ck touch</strong></label>
+                    <div class="controls">
+                        <label class="radio inline">
+                            <input type="radio" class="k-radio" name="ck_touch" id="ck_touch_off" value="0" ${'checked' if not ck_touch or ck_touch==0 else ''}>
+                            <label class="k-radio-label" for="ck_touch_off">off</label>
+                        </label>
+                        <label class="radio inline">
+                            <input type="radio" class="k-radio" name="ck_touch" id="ck_touch_on" value="1" ${'checked' if ck_touch and ck_touch==1 else ''}>
+                            <label class="k-radio-label" for="ck_touch_on">on</label>
+                        </label>
+                    </div>
+              </div>
+              <div class="control-group">
+                    <label class="control-label" for="ck_touch_html"><strong>ck touch html</strong></label>
+                    <div class="controls">
+                        <input id="ck_touch_html" name='ck_touch_html' type="text" ${'value="'+ck_touch_html+'"' if ck_touch and ck_touch_html and ck_touch == 1 else "readonly"}/>
+                    </div>
+              </div>
+
+            <div class="control-group" style="display:block">
+                    <label class="control-label" for="ck_cookie_on"><strong>ck cookie</strong></label>
+                    <div class="controls">
+                        <label class="radio inline">
+                            <input type="radio" class="k-radio" name="ck_cookie" id="ck_cookie_off" value="0" ${'checked' if not ck_cookie or ck_cookie==0 else ''}>
+                            <label class="k-radio-label" for="ck_cookie_off">off</label>
+                        </label>
+                        <label class="radio inline">
+                            <input type="radio" class="k-radio" name="ck_cookie" id="ck_cookie_on" value="1" ${'checked' if ck_cookie and ck_cookie==1 else ''}>
+                            <label class="k-radio-label" for="ck_cookie_on">on</label>
+                        </label>
+                    </div>
+              </div>
+              <div class="control-group" style="display:block">
+                    <label class="control-label" for="ck_cookie_time"><strong>ck cookie time</strong></label>
+                    <div class="controls">
+                        %if ck_cookie and ck_cookie == 1:
+                            <input id="ck_cookie_time" name="ck_cookie_time" type="text" value=${ck_cookie_time if ck_cookie_time else ""}> Seconds
+                        %else:
+                            <input id="ck_cookie_time" name="ck_cookie_time" type="text" value=0 readonly> Seconds
+                        %endif
+                    </div>
+              </div>
+              ${tips['ck_cookie_time'] if tips.get('ck_cookie_time') else ""}
+
+              <div class="control-group" style="display:block">
+                    <label class="control-label" for="ck_cookie_html"><strong>ck cookie html</strong></label>
+                    <div class="controls">
+                        <input id="ck_cookie_html" name='ck_cookie_html' type="text" ${'value="'+ck_cookie_html+'"' if ck_cookie and ck_cookie_html and ck_cookie == 1 else "readonly"}/>
+                    </div>
+              </div>
+                ${tips['ck_cookie_html'] if tips.get('ck_cookie_html') else ""}
+
+              <div class="control-group">
+                    <label class="control-label" for="ck_meta_refresh_btn"><strong>ck meta refresh</strong></label>
+                    <div class="controls">
+                            <label class="radio inline">
+                                <input type="radio" name="ck_meta_refresh" class="k-radio" id="ck_meta_refresh_off" value="0" ${'checked' if not ck_meta_refresh or ck_meta_refresh==0 else ''}>
+                                <label class="k-radio-label" for="ck_meta_refresh_off">off</label>
+                            </label>
+                            <label class="radio inline">
+                                <input type="radio" name="ck_meta_refresh" class="k-radio" id="ck_meta_refresh_on" value="1" ${'checked' if ck_meta_refresh and ck_meta_refresh==1 else ''}>
+                                <label class="k-radio-label" for="ck_meta_refresh_on">on</label>
+                            </label>
+                    </div>
+          </div>
+            ${tips['ck_meta_refresh'] if tips.get('ck_meta_refresh') else ""}
+            <div class="control-group">
+                    <label class="control-label" for="ck_meta_refresh_btn"><strong>lander domains dist</strong></label>
+                <div class="controls">
+                    <div id="lander_domains_dist" ></div>
+                    <input type="hidden" name="lander_domains_dist">
+                </div>
+              </div>
+            <input type="hidden" id="clone_switch" name="clone" value=1 disabled>
+
+            <div class="control-group">
+                <div class="controls">
+                    <input id="mysmt" type="button" class="k-button btn-save" value="Submit">
+                    <a href="${list_url}" class="k-button btn-cancel">Cancel</a>
+                    %if duplicate_url:
+                    <button id="duplicate" type="button" class="k-button">Clone</button>
+                    %endif
+
+                    <div id="flowModal" class="modal hide fade flow-modal" tabindex="-1" role="dialog" aria-hidden="true">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h3 id="flowModalLabel">Flow</h3>
+                      </div>
+                      <div class="modal-body">
+                        <div class="row-fluid">
+                            <div class="span3 nav">
+                                <ul id="flow-treeview"> </ul>
+                                <input type="hidden">
+                            </div>
+                            <div class="span9 body">
+                                <div id="flow-modal-body"></div>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button id="new_flow_sub" class="btn-save k-button" type=button aria-hidden="true">Save</button>
+                        <button class="k-button btn-cancel" data-dismiss="modal" aria-hidden="true">Exit</button>
+                      </div>
+                    </div>
+                </div>
+            </div>
+    </form>
+    <div id="switchPathModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+               <h3 id="myModalLabel">Switch Path</h3>
+               <input type="hidden" id="switch_path_id" value="-1">
+               <input type="hidden" id="switch_path_len" value="0">
+               <input type="hidden" id="switch_path_init" value="0">
+        </div>
+        <div class="modal-body" id="modal_body_div">
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">close</button>
+            <input class="btn btn-primary" type="button" value="commit" id="save_switch_path">
+        </div>
+    </div>
+</div>
+<style>
+#flow-treeview .k-in{margin-right:0px}
+    .sp_base{
+        margin-left:5px;
+        margin-top:5px;
+    }
+</style>
+
+<script id="flow-treeview-tmp" type="text/kendo-ui-template">
+<div class="row-fluid" style="width:150px">
+    #:item.text#
+    # if (item.type == 'path') { #
+        <div class="pull-right">#:item.weight#</div>
+    # } #
+</div>
+</script>
+
+<script src="/assets/admin/js/campaign.js" type="text/javascript"></script>
+<script src="/assets/admin/js/ZeroClipboard.min.js" type="text/javascript"></script>
+<script type="text/javascript" >
+    var clip = new ZeroClipboard($("#clone"));
+    var clip_full = new ZeroClipboard($("#clone-full"));
+    var source_map = {};
+
+    clip_full.on( 'ready', function(event) {
+        clip_full.on( 'copy', function(event) {
+            var sid = $("#source_id").val();
+            if(sid.length == 0) {
+              event.clipboardData.setData('text/plain', "http://" + $("#track_domain").val() + $("#uri").val());
+            } else if(source_map[sid]) {
+              event.clipboardData.setData('text/plain', "http://" + $("#track_domain").val() + $("#uri").val() + "?" + source_map[sid]);
+            } else {
+                $.ajax({
+                    type:"GET",
+                    async: false,
+                    url:"${get_source_url}",
+                    data:{source_id:sid},
+                    success:function(msg) {
+                      source_map[sid] = msg;
+                      event.clipboardData.setData('text/plain', "http://" + $("#track_domain").val() + $("#uri").val() + "?" + msg);
+                    }
+                });
+            }
+        });
+    });
+    clip_full.on( 'error', function(event) {
+        ZeroClipboard.destroy();
+    } );
+
+    var lander = new Array(${len(options['lander'])})
+    % for i in xrange(len(options['lander'])):
+        lander[${i}] = new Array(2)
+        lander[${i}][0] = ${options['lander'][i].id}
+        lander[${i}][1] = "${options['lander'][i].name}"
+    % endfor
+
+    var offer = new Array(${len(options['offer'])})
+    % for i in xrange(len(options['offer'])):
+        offer[${i}] = new Array(2)
+        offer[${i}][0] = ${options['offer'][i].id}
+        offer[${i}][1] = "${options['offer'][i].name}"
+    % endfor
+
+    <%
+    import ujson
+    rule_type = ujson.dumps(rule_config.rule_type);
+    first_category = ujson.dumps(rule_config.rule_first_category);
+    %>
+
+    var treeview;
+
+    var flows = {};
+    var rule_type = ${rule_type};
+    var rule_first_category = ${first_category};
+
+    function init_treeview(dataItems, select_item) {
+        treeview = $("#flow-treeview").kendoTreeView({
+            dataSource: dataItems,
+            template:kendo.template($("#flow-treeview-tmp").html()),
+            select: select_item}
+        ).data("kendoTreeView");
+    }
+    function get_country_flow_prefix() {
+        var t = [$("#source_id").val()?$("#source_id").find("option:selected").text():"unknow", $("#country").val().length?$("#country").val():"unknow", ""];
+        return t.join("-");
+    }
+
+    function do_add_switch_path_part(tag, t, index, parentDiv)
+    {
+        //var label = document.createElement("label");
+        //label.setAttribute("class", "control-lbel");
+        var font = document.createElement("font");
+        font.setAttribute("class", "sp_base");
+        font.appendChild(document.createTextNode(tag));
+        //label.appendChild(font);
+        var select = document.createElement("select");
+        select.id = tag + t + index;
+        select.name = tag;
+        select.setAttribute("style", "width:180px;");
+        select.setAttribute("class", "sp_base");
+        
+        parentDiv.appendChild(font);
+        parentDiv.appendChild(select);
+    }
+
+    function add_switch_paths(items)
+    {
+        var obj = document.getElementById("switch_path_len");
+        var len = obj.value;
+        add_switch_path(len, "", items);
+        obj.len = len + 1;
+    }
+
+    function add_switch_path(index, rule, items)
+    {
+        var myDate = new Date();
+        var t = myDate.getTime();
+        var parentDiv = document.getElementById("switch_path_div");
+
+        var div = document.createElement("div");
+        div.setAttribute("class", "control-group row-fluid");
+        div.id = "switch_path_part_div_" + t + index;
+
+        do_add_switch_path_part("select_swap", t, index, div);
+        do_add_switch_path_part("select_master", t, index, div);
+        do_add_switch_path_part("select_slave", t, index, div);
+
+        var btn = document.createElement("input");
+        btn.id = "sp_delete_btn_" + t + index;
+        btn.type = "button";
+        btn.value = "delete";
+        btn.setAttribute("onclick", "delete_switch_path(" + div.id + ")");
+        btn.setAttribute("class", "btn sp_base");
+        div.appendChild(btn);
+
+        parentDiv.appendChild(div);
+
+        var obj = document.getElementById("switch_path_len");
+        obj.value = parseInt(index) + 1;
+        do_init_switch_path(t, index, rule, items);
+    }
+
+    function init_switch_path_modal()
+    {
+        var parentDiv = document.getElementById("modal_body_div");
+        var div = document.getElementById("switch_path_div");
+        var btn = document.getElementById("add_switch_path");
+        if (div != null)
+            parentDiv.removeChild(div);
+        if (btn != null)
+            parentDiv.removeChild(btn);
+    }
+
+    function delete_switch_path(selectDiv)
+    {
+        var parentDiv = document.getElementById("switch_path_div");
+        parentDiv.removeChild(selectDiv);
+        var obj = document.getElementById("switch_path_len");
+        obj.value = parseInt(obj.value) - 1;
+    }
+
+    function init_add_sp_btn(data)
+    {
+        var parentDiv = document.getElementById("modal_body_div");
+        var div = document.createElement("div");
+        div.id = "switch_path_div";
+        div.setAttribute("class", "control-group");
+
+        var btn = document.createElement("input");
+        btn.type = "button";
+        btn.id = "add_switch_path";
+        btn.value = "add_rules";
+        btn.setAttribute("onclick", "add_switch_paths("+ data + ")");
+        parentDiv.appendChild(div);
+        parentDiv.appendChild(btn);
+    }
+
+    function init_switch_paths(data)
+    {
+        init_switch_path_modal();
+        init_add_sp_btn(data);
+        var items = JSON.parse(data);
+        var rules = items["rules"];
+        var rule_list = rules.split(";");
+        var rule_len = rule_list.length;
+        for (var i = 0; i < rule_len;++i)
+        {
+            if (rule_list[i] != "")
+                add_switch_path(i, rule_list[i], items);
+        }
+    }
+
+    function do_init_switch_path(t, index, rules, items)
+    {
+        var swaps = items["swaps"];
+        var dataItems = [];
+        for (var obj in swaps)
+        {
+            var tmp = {};
+            tmp["value"] = obj;
+            tmp["text"] = swaps[obj];
+            dataItems.push(tmp);
+        }
+        var swap_tag = "select_swap" + t + index;
+        var master_tag = "select_master" + t + index;
+        var slave_tag = "select_slave" + t + index;
+
+        $("#"+master_tag).kendoDropDownList();
+        $("#"+slave_tag).kendoDropDownList();
+        $("#"+swap_tag).kendoDropDownList({
+            filter : "contains",
+            optionLabel : "select swap...",
+            dataSource : dataItems,
+            dataTextField : "text",
+            dataValueField : "value",
+            change : function(e) {init_select_sp_paths(items, swap_tag, master_tag, slave_tag)},
+        });
+
+        if (rules != "")
+        {
+            var list = rules.split("|");
+            $("#"+swap_tag).data("kendoDropDownList").value(parseInt(list[0]));
+            init_select_sp_paths(items, swap_tag, master_tag, slave_tag);
+            $("#"+master_tag).data("kendoDropDownList").value(parseInt(list[1]));
+            $("#"+slave_tag).data("kendoDropDownList").value(parseInt(list[2]));
+        }
+        var sp_id = items["sp_id"];
+        if (sp_id != null)
+        {
+            document.getElementById("switch_path_id").value = sp_id;
+        }
+    }
+
+    function init_select_sp_paths(items, swap_tag, master_tag, slave_tag)
+    {
+        var swap_id = parseInt(document.getElementById(swap_tag).value);
+        var paths = items["paths"][swap_id];
+        var dataItems = [];
+        for (var obj in paths)
+        {
+            var tmp = {};
+            tmp["value"] = obj;
+            tmp["text"] = paths[obj];
+            dataItems.push(tmp);
+        }
+        $("#"+master_tag).kendoDropDownList({
+            filter : "contains",
+            optionLabel : "select path...",
+            dataSource : dataItems,
+            dataTextField : "text",
+            dataValueField : "value",
+        });
+
+        $("#"+slave_tag).kendoDropDownList({
+            filter:"contains",
+            optionLabel:"select path...",
+            dataSource : dataItems,
+            dataTextField: "text",
+            dataValueField: "value",
+        });
+    }
+
+    var orig_name = "";
+
+    $( document ).ready( function() {
+        CreateNationOption("country", ${country_config}, '${country if country else ""}');
+
+        %if name and country:
+        var name_indx = "${name}".indexOf("${country}")
+        if (name_indx != -1) {
+            name_indx += "${country}".length + 1
+            orig_name = "${name}".substring(name_indx);
+        }
+        %endif
+        set_sec_cate_url("${sec_cate_url}");
+        init_lander_option(lander);
+        init_offer_option(offer);
+        init_rule_type_name(rule_type);
+
+        $("#name").bind("input", function() {
+            var t = get_country_flow_prefix();
+            if($(this).val().indexOf(t) != 0) {
+                $(this).val(t+orig_name);
+            } else {
+                orig_name = $(this).val().slice(t.length);
+            }
+        });
+
+        $("#country").change(function() {
+            $("#name").val(get_country_flow_prefix() + orig_name);
+        });
+
+        $("#country").kendoDropDownList({
+            height:400, filter:"contains",
+            optionLabel:"select country...",
+        });
+
+        $("#flowModal").on("hidden", function() {
+           $("#flow-modal-body").empty();
+           $("#new_flow_sub").removeAttr("disabled");
+        });
+        %if duplicate_url:
+            $("#duplicate").click(function() {
+                $("#clone_switch").removeAttr("disabled");
+                $("#myform").attr("action", "${duplicate_url}");
+                $("#mysmt").click();
+            })
+        %endif
+
+        function select_item(e) {
+            $("#flow-modal-body").empty();
+
+            var node = this.dataItem(e.node);
+            if(node.type == "add path") {
+                var parent_node = this.dataItem(this.parent(e.node));
+                this.remove(e.node);
+                add_treeview_path(parent_node, parent_node.children.data().length + 1);
+                parent_node.append(node);
+
+                var last_node = parent_node.items[parent_node.items.length - 2]
+                var f = this.findByUid(last_node.uid);
+                this.select(f);
+                this.trigger("select", {node: f});
+                e.preventDefault();
+            } else if (node.type == "add rule") {
+                this.remove(e.node);
+                add_treeview_rule(this);
+                this.append(node);
+                var last_node = this.root[0].childNodes[this.root[0].children.length -2];
+                last_node = this.dataItem(last_node);
+                var f = this.findByUid(last_node.uid);
+                this.select(f);
+                this.trigger("select", {node: f});
+                e.preventDefault();
+            } else if(node.type == "path") {
+                init_path_body(node, this);
+            } else if(node.type == "flow") {
+                init_flow_body(node);
+            } else if(node.type == "rule") {
+                init_rule_body(node, rule_type, rule_first_category);
+            }
+        }
+        $("#flow_id").kendoDropDownList({
+            height:400, filter:"contains",
+            optionLabel:"select flow...",
+            dataSource:[
+                % for v in options['flow_id']:
+                {value:"${v.id}", text:"${v.name}"},
+                % endfor
+            ],
+            dataTextField: "text",
+            dataValueField: "value",
+        });
+            %if flow_id:
+                $("#flow_id").data("kendoDropDownList").value("${flow_id}");
+            %endif
+
+        var source_select = $("#source_id").kendoDropDownList({
+            height:400, filter:"contains",
+            optionLabel:"select source...",
+            dataSource:[
+                % for v in options['source_id']:
+                {value:"${v.id}", text:"${v.name}"},
+                % endfor
+            ],
+            dataTextField: "text",
+            dataValueField: "value",
+            change:function() {
+                $("#name").val(get_country_flow_prefix() + orig_name);
+            }
+        });
+        %if is_inner_user:
+            %if admin_source_id:
+                $("#source_id").data("kendoDropDownList").value("${admin_source_id}");
+            %endif
+        %else:
+            %if source_id:
+                $("#source_id").data("kendoDropDownList").value("${source_id}");
+            %endif
+        %endif
+
+        $("#name").val(get_country_flow_prefix()+orig_name);
+
+        $("#track_domain").kendoDropDownList({
+            height:400, filter:"contains",
+            optionLabel:"select domain...",
+            dataSource:[
+                % for v in options['track_domains']:
+                {value:"${v}", text:"${v}"},
+                % endfor
+            ],
+            dataTextField: "text",
+            dataValueField: "value",
+            change:function() { $("#full-uri").val("http://" + $("#track_domain").val() + $("#uri").val());}
+        });
+
+        %if track_domain:
+        $("#track_domain").data("kendoDropDownList").value("${track_domain}");
+        %endif
+        $("#full-uri").val("http://" + $("#track_domain").val() + $("#uri").val());
+
+        function handle_check_offer_alert(msg) {
+            var ret = "<ul>";
+            var f = false;
+            for(var k in msg) {
+                f = true;
+                ret += "<li>" + k;
+                if(msg[k].length != undefined) {
+                    ret += "<ul><li>" + msg[k].join("</li><li>") + "</li></ul>";
+                } else {
+                    ret += handle_check_offer_alert(msg[k]);
+                }
+                ret += "</li>";
+            }
+            ret += "</ul>";
+            return f?ret:"";
+        }
+
+        %if type(id) == int:
+        $("#check-camp").click(function() {
+                var url = "${check_camp_url}?cpid=${id}";
+                window.open(url, "_blank")
+        });
+        %endif
+
+        $("#check-offer").click(function() {
+            var data = {
+                country: $("#country").data("kendoDropDownList").value(),
+                flow_id: $("#flow_id").data("kendoDropDownList").value(),
+            }
+            $.ajax({
+                type:"POST",
+                url:"${check_offer_url}",
+                data:data,
+                success:function(msg) {
+                    res = false;
+                    var html = handle_check_offer_alert(msg);
+                    var div = "";
+                    if(!html.length) {
+                        div = '<div class="alert alert-success"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>success!</strong></div>';
+                    } else {
+                        div = '<div class="alert alert-error"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>Offer\'s country doesn\'t match'+html+'</strong></div>';
+                    }
+                    $("#check-offer-alert").html(div);
+                }
+            });
+        });
+
+        var tooltip = $("#flow-div").kendoTooltip({
+            filter: "#check-offer",
+            width: 230,
+            position: "top"
+        }).data("kendoTooltip");
+
+        $("#edit_flow").click(function() {
+            if (!$("#flow_id").val()) { return; }
+            var flow_id = $("#flow_id").val();
+
+            var flow = flows[flow_id];
+            $.ajax({
+               type:"GET",
+               url:"${get_flow_url}",
+               data:{id:flow_id},
+               success: function(data) {
+                   var f = JSON.parse(data);
+                   if(f.err) return;
+                   var dataItems = init_treeview_data(f);
+                   flows[flow_id] = dataItems;
+                   init_treeview(dataItems, select_item);
+                   $("#flowModal").modal('toggle');
+               }
+            });
+        });
+
+        $("#new_flow_sub").click(function() {
+            var val = get_treeview_value(treeview);
+            if(val.error) {
+                alert(val.error);
+            } else {
+                $("#new_flow_sub").attr("disabled", "disabled");
+                $.ajax({
+                    type:"POST",
+                    url:"${save_flow_url}",
+                    data:{flow:val},
+                    success:function(msg) {
+                        msg = JSON.parse(msg)
+                        if(!msg.err) {
+                            var op_update = false;
+                            var flow_options = $("#flow_id").children();
+                            for(var i = 0; i < flow_options.length; i++) {
+                                if($(flow_options[i]).val() == msg.id) {
+                                    $(flow_options[i]).text(msg.name);
+                                    op_update = true;
+                                    break;
+                                }
+                            }
+                            if(!op_update) {
+                                var tmp = $("#flow_id").data("kendoDropDownList");
+                                tmp.dataItems().push({text:msg.name, value:msg.id});
+                                tmp.refresh();
+                            }
+                            $("#flowModal").modal('toggle');
+                        } else {
+                            alert("save error : " + msg.err);
+                        }
+                        $("#new_flow_sub").removeAttr("disabled");
+                    }
+                });
+            }
+         });
+
+        $("#create_flow").click(function() {
+            $("#flow-modal-body").empty();
+            treeview = $("#flow-treeview").kendoTreeView({
+                dataSource: get_treeview_data(),
+                template:kendo.template($("#flow-treeview-tmp").html()),
+                select: select_item}
+            ).data("kendoTreeView");
+            $("#flowModal").modal("toggle");
+        });
+
+        $("#switch_path").click(function() {
+            if (!$("#flow_id").val()) { return; }
+            var flow_id = $("#flow_id").val();
+            var cpid = $("#campaign_id").val();
+            $.ajax({
+               type:"GET",
+               url:"${get_switch_path_url}",
+               data:{flow_id:flow_id},
+               success: function(data) {
+                   init_switch_paths(data);
+                   $('#switchPathModal').modal().css({
+                       width:'1000px',
+                       'margin-left':function(){
+                           return -($(this).width()/2);
+                           }
+                    });
+                   $("#switchPathModal").modal('show');
+               }
+            });
+        });
+
+        function obj2str(obj)
+        {
+            var res = []
+            for (var idx=0; idx<obj.length;++idx)
+            {
+                var o = obj[idx];
+                res.push(o.value);
+            }
+            return res.join(",");
+        }
+
+        $("#save_switch_path").click(function() {
+            if (!$("#flow_id").val()) { return; }
+            if (!$("#campaign_id").val()) { return; }
+            var flow_id = $("#flow_id").val();
+            var cpid = $("#campaign_id").val();
+            var swap = document.getElementsByName("select_swap");
+            var master = document.getElementsByName("select_master");
+            var slave = document.getElementsByName("select_slave");
+            var sp_id = document.getElementById("switch_path_id").value;
+            var d = {
+                "cpid" : cpid,
+                "flow_id" : flow_id,
+                "swap_ids" : obj2str(swap),
+                "master_ids" : obj2str(master),
+                "slave_ids" : obj2str(slave),
+                "sp_id" : sp_id,
+            }
+            $.ajax({
+               type:"GET",
+               url:"${save_switch_path_url}",
+               data : d,
+               success: function(data) {
+                   var f = JSON.parse(data);
+                   $("#switchPathModal").modal('hide');
+               }
+            });
+        });
+
+        var website = []
+        % if ck_websiteid_digit and ck_websiteid_digit == 1:
+            website.push("ck_websiteid_digit");
+        % endif
+        % if ck_websiteid_typo and ck_websiteid_typo == 1:
+            website.push("ck_websiteid_typo");
+        % endif
+        $("#website").select2();
+        $("#website").val(website).trigger("change");
+
+        $("#website").on('change', function(){
+            var target = {};
+            $("#website option").each(function() {
+                target[$(this).val()] = 0;
+            });
+            $.each($(this).select2('data'), function(index, val) {
+                target[val.id] = 1;
+            });
+            var is_readonly = true;
+            for(var i in target) {
+                if (target[i]) {is_readonly=false;}
+                $("#" + i).val(target[i]);
+            }
+            if(is_readonly) {$("#ck_websiteid_html").attr("readonly", true);}
+            else {$("#ck_websiteid_html").attr("readonly", false)}
+        });
+
+        $('#ck_cloak_on').bind('click', function() {
+            turn_on('ck_cloak_html');
+        })
+
+        $('#ck_cloak_off').bind('click', function() {
+            turn_off('ck_cloak_html');
+        })
+
+        $('#ck_cloak_ts_on').bind('click', function() {
+            turn_on('ck_cloak_ts_html');
+        })
+
+        $('#ck_cloak_ts_off').bind('click', function() {
+            turn_off('ck_cloak_ts_html');
+        })
+
+        $('#ck_cloak_ts_on2').bind('click', function() {
+            turn_on('ck_cloak_ts_html2');
+        })
+
+        $('#ck_cloak_ts_off2').bind('click', function() {
+            turn_off('ck_cloak_ts_html2');
+        })
+
+        $("#ck_touch_on").bind("click", function() {
+            turn_on("ck_touch_html");
+        })
+
+        $("#ck_touch_off").bind("click", function() {
+            turn_off("ck_touch_html");
+        })
+
+        $('#ck_android_on').bind('click', function() {
+            turn_on('ck_android_html');
+        })
+
+        $('#ck_android_off').bind('click', function() {
+            turn_off('ck_android_html');
+        })
+
+        $("#ck_cookie_on").bind("click", function() {
+            turn_on("ck_cookie_time");
+            turn_on("ck_cookie_html");
+        })
+
+        $("#ck_cookie_off").bind("click", function() {
+            turn_off("ck_cookie_time");
+            turn_off("ck_cookie_html");
+        })
+
+        var ldd = $("#lander_domains_dist").InitAddInputCompent({data:"${lander_domains_dist if lander_domains_dist else ""}"});
+        $("#mysmt").kendoButton({
+            click:function(){
+                var v = ldd.GetValue();
+                if(v.ret) {
+                    $("input[name=lander_domains_dist]").val(v.data);
+                    $("#name").val($.trim($("#name").val()));
+                    var source_val = source_select.val();
+                    %if is_inner_user:
+                        $("input[name=source_id]").val(0);
+                        $("input[name=admin_source_id]").val(source_val);
+                    %else:
+                        $("input[name=source_id]").val(source_val);
+                        $("input[name=admin_source_id]").val(0);
+                    %endif
+                    $("#myform").submit();
+                }
+            }
+        });
+
+        %if 'lander_domains_dist' in tips:
+            ldd.Res(${tips['lander_domains_dist']});
+        %endif
+    } );
+</script>
+
+<script type="text/javascript">
+    function select2str(obj)
+    {
+            var data = obj.select2('data');
+            var array = [];
+            $.each(data, function(index, val) {
+                array[index]=val.id;
+                });
+            return array.join(',');
+    }
+</script>
+
+${campaign_update_cost}

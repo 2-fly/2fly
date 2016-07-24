@@ -1,0 +1,42 @@
+<div class="row-fluid">
+    <ul class="nav nav-tabs">
+      <li>
+          <a href="${list_url}" title="Landerpage list">List</a>
+      </li>
+      <li>
+          <a href="${create_url}" title="Create landerpage">Create</a>
+      </li>
+      <li class="active">
+          <a href="javascript:void(0)" title="Batch upload files">Batch Upload</a>
+      </li>
+    </ul>                        
+</div>
+
+<div class="row-fluid">
+    <div class="control-group">
+        ${tips}
+    </div>
+    <form action="" method="POST" class="admin-form form-horizontal" enctype="multipart/form-data">
+        <div id="upload_div">
+            <input name="upload_files" id="upload_files" type="file">
+        </div>
+        <div class="m_buttom">
+            <input id="submit" type="submit" class="k-button btn-save m_button" value="Submit">
+        </div>
+    </form>
+</div>
+
+<style>
+    .m_button{
+        margin-top:20px;
+        margin-left:10px;
+        float:left;
+    }
+</style>
+
+<script>
+    $(document).ready(function()
+    {
+        $("#upload_files").kendoUpload();
+    });
+</script>

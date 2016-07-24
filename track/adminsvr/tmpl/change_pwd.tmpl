@@ -1,0 +1,72 @@
+<div class="row-fluid">
+    <ul class="nav nav-tabs">
+      <li class="active">
+          <a href="javascript:void(0)">Edit</a>
+      </li>
+    </ul>
+</div>
+
+<div class="row-fluid">
+    <div class="control-group">
+        ${ret}
+    </div>
+    <form action="${submit_url}" method="POST" class="form-horizontal" id="myform" enctype="multipart/form-data">
+        <div class="control-group">
+            <label class="control-label" for="time_zone" class="control-label"><strong>Password</strong></label>
+            <div class="controls">
+                <div class="row-fluid">
+                    <input id="old" type="password" name="old" value="">
+                    <span id="old-err" class="label label-important" style="margin-left:20px">${"field is error!" if old_error else ""}</span>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" class="control-label"><strong>New Password</strong></label>
+            <div class="controls">
+                <div class="row-fluid">
+                    <input id="new" type="password" name="new">
+                    <span id="new-err" class="label label-important" style="margin-left:20px"></span>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" class="control-label"><strong>Comfirn Password</strong></label>
+            <div class="controls">
+                <div class="row-fluid">
+                    <input id="comfirn" type="password" name="comfirn">
+                    <span id="comfirn-err" class="label label-important" style="margin-left:20px"></span>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <button id="mysmt" type="button" class="k-button btn-save">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $("#mysmt").click(function() {
+             var err_msg = "field is error!";
+             var err = false;
+             if(!$("#new").val()) {
+                err = true;
+                $("#new-err").text(err_msg);
+             }
+             if(!$("#old").val()) {
+                err = true;
+                $("#old-err").text(err_msg);
+             }
+             if($("#new").val() != $("#comfirn").val()) {
+                err = true;
+                $("#comfirn-err").text("The passwords you entered must be same");
+             }
+             if(!err)
+                $("#myform").submit();
+          })
+      });
+</script>
+
+

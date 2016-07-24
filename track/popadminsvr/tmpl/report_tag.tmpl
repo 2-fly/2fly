@@ -1,0 +1,137 @@
+<div class="row-fluid">
+    <div id="filter_table" class="m_checkbox">
+        %if len(checkbox) > 0:
+            <div class="m_child_checkbox">
+                <input type="checkbox" id="all_checkbox" name="all_checkbox" onclick=onAllCheckboxClick(this) style="zoom:150%;"><font class="m_checkbox_font">all</font>
+            </div>
+            <p></p>
+        %endif
+        % for i in xrange(len(checkbox)):
+            <div class="m_child_checkbox">
+                <input type="checkbox" class="m_each_checkbox" id=${checkbox[i]} name=${checkbox[i]} style="zoom:150%;"><font class="m_checkbox_font">${checkbox[i]}</font>
+            </div>
+            %if (i+1) % 5 == 0:
+                <p></p>
+            %endif
+        %endfor
+    </div>
+</div>
+<br>
+
+<div id="charts">
+</div>
+<div id="datatable">
+</div>
+<style>
+    .m_checkbox
+    {
+        float:left;
+        width:100%;
+    }
+    .m_child_checkbox
+    {
+        display:inline;
+        overflow:hidden;
+        margin-left:10px;
+        margin-top:2px;
+    }
+    .m_checkbox_font
+    {
+        font-size:15px;
+        margin-left:1px;
+        margin-top:2px;
+    }
+    .title
+    {
+        text-align:left;
+    }
+</style>
+
+<script>
+    function remove_datatable()
+    {
+        var divParent = document.getElementById("datatable");
+        while (divParent.hasChildNodes())
+        {
+            divParent.removeChild(divParent.firstChild);
+        }
+    }
+
+    function add_datatable(tag, title)
+    {
+        var divParent = document.getElementById("datatable");
+        var divGroup = document.createElement("div");
+        divGroup.id = tag + "_group";
+        if (title != "")
+        {
+            var divTitle = document.createElement("div");
+            divTitle.setAttribute("class", "title");
+            var titleH4 = document.createElement("h4");
+            titleH4.appendChild(document.createTextNode(title));
+            divTitle.appendChild(titleH4);
+            divGroup.appendChild(divTitle);
+        }
+        var divTable = document.createElement("div");
+        divTable.id = tag;
+
+        var divTips = document.createElement("div");
+        var Tips = document.createElement("p");
+        Tips.id = tag+"tips";
+
+        divGroup.appendChild(divTable);
+        divGroup.appendChild(divTips);
+        divTips.appendChild(Tips);
+        var br = document.createElement("br");
+        divGroup.appendChild(br);
+        divParent.appendChild(divGroup);
+    }
+
+    function remove_charts() {
+        var divParent = document.getElementById("charts");
+        while(divParent.hasChildNodes()) {
+            divParent.removeChild(divParent.firstChild);
+        }
+    }
+
+    function add_chart(tag, title)
+    {
+        var divParent = document.getElementById("charts");
+        var divGroup = document.createElement("div");
+        divGroup.id = tag + "_group";
+        divGroup.style = "display:block";
+        if (title != "")
+        {
+            var divTitle = document.createElement("div");
+            divTitle.setAttribute("class", "title");
+            var titleH4 = document.createElement("h4");
+            titleH4.appendChild(document.createTextNode(title));
+            divTitle.appendChild(titleH4);
+            divGroup.appendChild(divTitle);
+        }
+        var divTable = document.createElement("div");
+        divTable.id = tag;
+        divTable.style = "width:100%;min-width:310px;margin:0 auto;height:";
+
+        var divTips = document.createElement("div");
+        var Tips = document.createElement("p");
+        Tips.id = tag+"tips";
+
+        divGroup.appendChild(divTable);
+        divGroup.appendChild(divTips);
+        divTips.appendChild(Tips);
+        var br = document.createElement("br");
+        divGroup.appendChild(br);
+        divParent.appendChild(divGroup);
+    }
+
+
+    function onAllCheckboxClick(checkbox)
+    {
+        for (var idx in ${checkbox})
+        {
+            var box = ${checkbox}[idx];
+            document.getElementById(box).checked = checkbox.checked;
+        }
+    }
+</script>
+

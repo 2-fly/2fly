@@ -1,0 +1,104 @@
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active"><a href="#">List</a></li>
+  <li role="presentation"><a data-pjax href="${add_url}">Create</a></li>
+</ul>
+<h3>Your Campaign</h3>
+<div>
+    <div id="campaign-list" ></div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        var grid = $("#campaign-list").kendoGrid({
+            dataSource:{
+                data:${data_list},
+                pageSize:20,
+                sort:[{field:"id", dir:"desc"}],
+            },
+            dataBound:function() {initPjaxTag($("a[data-pjax]"), "#content-inner")},
+            columns:[
+                {filterable:false,field:"id", width:30,title:" ", sortable:false, template:"<a data-pjax class='edit-icon' href='${edit_url}?id=#:id#'><img src='/assets/image/edit-icon.png'></img></a>"},
+                { field:"name", width:150},
+                {filterable:false,field:"status", width:100, template:$("#status").html()},
+                {filterable:false,field:"country", width:100},
+                {filterable:false,field:"os", width:100},
+                {filterable:false,field:"browser", width:100},
+                {filterable:false,field:"max_bid", width:80},
+                {filterable:false,field:"daily_website_budget", width:80},
+                {filterable:false,field:"daily_budget", width:80},
+                {filterable:false,field:"total_budget", width:80},
+                {filterable:false,field:"image_width_heights", width:80, title:"image_size"},
+                {filterable:false,field:"url", width:150, sortable:false},
+            ],
+            toolbar: kendo.template($("#toolbar-tmp").html()),
+            sortable:true,
+            filterable: {
+                extra: false,
+                operators: {
+                    string: {
+                        contains: "Contains",
+                    }
+                }
+            },
+            pageable: {
+                pageSizes: true,
+                buttonCount: 5
+            },
+            dataBound:function() {
+                var that = this;
+                $.each(this.dataSource.view(), function(_, e) {
+                    var s = that.tbody.find("tr[data-uid='"+e.uid+"']").find("input[data-role=switch]");
+                    var sw = s.kendoMobileSwitch().data("kendoMobileSwitch");
+                    sw.bind("change", function(radio) {
+                        var url = "/campaign/switch?cid="+e.id+"&status="+(radio.checked?1:0);
+                        $.ajax({
+                            url: url,
+                            success:function(data) {
+                                data = parseInt(data);
+                                if(data) {
+                                    var d = that.dataSource.getByUid(e.uid);
+                                    d.status = radio.checked?"On":"Off";
+                                }
+                                that.refresh();
+                            }
+                        })
+                    })
+                });
+            }
+        });
+
+        dropdownlist = grid.find("#category").kendoDropDownList({
+            dataTextField: "text",
+            dataValueField: "value",
+            dataSource:{
+                data:[{text:'On', value:"On"}, {text:'Off', value:"Off"}, {text:'All', value:"All"} ]
+            },
+            select: function(e) {
+                var item = this.dataItem(e.item)
+                var val = item.value;
+                if (val != "All") {
+                    grid.data("kendoGrid").dataSource.filter({ field: "status", operator: "eq", value: val});
+                } else {
+                    grid.data("kendoGrid").dataSource.filter({});
+                }
+            }
+        }).data("kendoDropDownList");
+
+        dropdownlist.search("On");
+        grid.data("kendoGrid").dataSource.filter({ field: "status", operator: "eq", value: 'On'});
+    });
+
+</script>
+<script type="text/x-kendo-template" id="status">
+    <input type="checkbox" data-role="switch" #:status == "On"? "checked":""#>
+</script>
+<script type="text/x-kendo-template" id="toolbar-tmp">
+    <div class="flow-fluid" style="padding:5px">
+        <div class="">
+            <label style="line-height:30px" for="category">Show products by status :</label>
+            <input type="search" id="category" style="width:80px;margin-left:10px"/>
+        </div>
+    </div>
+</script>
+
+

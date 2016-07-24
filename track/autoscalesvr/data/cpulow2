@@ -1,0 +1,13 @@
+{
+      "Type" : "Notification",
+        "MessageId" : "95bfa52e-b479-5f4a-8cb7-e897f9e9c861",
+          "TopicArn" : "arn:aws:sns:us-east-1:105782521297:scale_test",
+            "Subject" : "ALARM: \"cpulow\" in US - N. Virginia",
+              "Message" : "{\"AlarmName\":\"cpulow\",\"AlarmDescription\":null,\"AWSAccountId\":\"105782521297\",\"NewStateValue\":\"ALARM\",\"NewStateReason\":\"Threshold Crossed: 1 datapoint (0.05) was less than or equal to the threshold (20.0).\",\"StateChangeTime\":\"2015-04-28T08:56:48.725+0000\",\"Region\":\"US - N.
+              Virginia\",\"OldStateValue\":\"INSUFFICIENT_DATA\",\"Trigger\":{\"MetricName\":\"CPUUtilization\",\"Namespace\":\"AWS/EC2\",\"Statistic\":\"AVERAGE\",\"Unit\":null,\"Dimensions\":[{\"name\":\"AutoScalingGroupName\",\"value\":\"c3.large.test\"}],\"Period\":300,\"EvaluationPeriods\":1,\"ComparisonOperator\":\"LessThanOrEqualToThreshold\",\"Threshold\":20.0}}",
+                "Timestamp" : "2015-04-28T08:56:48.771Z",
+                  "SignatureVersion" : "1",
+                    "Signature" : "LWcDV62WL3PSbmMestUP/W8KNaPhShJxCE0JqP2rr5c7kVLyYq14+5XYLLp+GRI3Q/jbvlBxMTIrXvWiMcfH3UZuH31zFsRhUdAdkN0HqcVs5xJQoZH2Jt6Qo+btIP6fosFmyTC26uIWsuNrptsf18xeyrXGWuqaQ+EtcDyEJry7Iq/HdkoSISWNhl1k4lilxaA/4YFDU7K0BU5f5jx2zfIDaXWIj0p2VRtkdcAcr5fyhF75oAwqJy1VfcipMjFfNbumyREpwBp0REcxEnjS7Lrz8X375VlcVMqmEynkEDejSRUaKrJxH8gDOIOmpgzok+6BZXLeuiwXqWA86zHyNg==",
+                      "SigningCertURL" : "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-d6d679a1d18e95c2f9ffcf11f4f9e198.pem",
+                        "UnsubscribeURL" : "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:105782521297:scale_test:893805c2-cafe-4340-ab24-f1c7525cab27"
+}

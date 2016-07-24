@@ -1,0 +1,35 @@
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active"><a href="#">List</a></li>
+  <li role="presentation"><a data-pjax href="${add_url}">Create</a></li>
+</ul>
+<h3>Your Website Bids</h3>
+<div>
+    <div id="websitebid-list"></div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $("#websitebid-list").kendoGrid({
+            dataSource:{
+                data:${data_list},
+                pageSize:20,
+            },
+            columns:[
+                {field:"id", width:50,title:" ", sortable:false, filterabe:false, template:"<a data-pjax class='edit-icon' href='${edit_url}?id=#:id#'><img src='/assets/image/edit-icon.png'></img></a>"},
+                {field:"country", width:150},
+                {field:"os", width:150},
+                {field:"browser", width:150},
+                {field:"status", width:70},
+                {field:"max_bid", width:150},
+            ],
+            sortable:true,
+            pageable: {
+                pageSizes: true,
+                buttonCount: 5
+            },
+        });
+
+        var pjax = $("a[data-pjax]");
+        initPjaxTag(pjax, "#content-inner");
+    });
+</script>

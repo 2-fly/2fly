@@ -1,0 +1,86 @@
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<script type="text/javascript" src="/assets/tinymce/js/tinymce/tinymce.min.js"></script>
+
+<div class="row-fluid">
+    <ul class="nav nav-tabs">
+      <li>
+          <a href="${list_url}">List</a>
+      </li>
+      <li class="active">
+          <a href="javascript:void(0)">Edit</a>
+      </li>
+    </ul>
+</div>
+
+<div class="row-fluid">
+    <form action="" method="POST" class="admin-form form-horizontal" enctype="multipart/form-data">
+      <fieldset>
+          <div class="control-group">
+            ${op_tips}
+          </div>
+        % for i in xrange(len(hidden_fields)):
+            <input id="${hidden_fields[i]['name']}" name="${hidden_fields[i]['name']}" type="hidden" value="${hidden_fields[i]['value']}">
+        % endfor
+        % for i in xrange(len(fields)):
+          <div class="control-group">
+            <div class="control-label">
+            <!--
+              <label for="name">${fields[i]}<strong style="color: red">*</strong>
+              -->
+              <label for="${fields[i]['name']}">${fields[i]['name']}</strong>
+              </label>
+            </div>
+            <div class="controls">
+              <div>
+              % if fields[i]['is_normal']:
+                % if fields[i]['name'] == 'source':
+                    <textarea id= "${fields[i]['name']}" name="${fields[i]['name']}" rows="25" cols="80" style="width: 80%">${fields[i]['value']}</textarea>
+                % else:
+                    <input id="${fields[i]['name']}" name="${fields[i]['name']}" type="text" value="${fields[i]['value']}">
+                % endif
+              % endif
+              </div>
+              ${fields[i]['tips']}
+            </div>
+
+        </div>
+        % endfor
+            <div class="control-group">
+              <div class="controls">
+                <input id="mysmt" type="submit" class="btn btn-primary btn-small" value="Submit">
+                <!--<input name="_add_another" type="submit" class="btn btn-large" value="Save and Add">-->
+                <a href="${list_url}" class="btn btn-small btn-danger">Cancel</a>
+
+                <script type="text/javascript">
+                    tinymce.init({
+                        selector:"textarea",
+                        // General options
+                        forced_root_block:'',
+                        theme : "modern",
+                        menubar : false,
+                        plugins : "autolink,lists,code,pagebreak,layer,table,save,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,template,advlist, fullpage",
+
+                        // preview
+                        plugin_preview_width:"600",
+                        plugin_preview_height:"500",
+                        // Theme options
+                        toolbar1: "newdocument,|, cut, copy, paste, undo,redo, | ,code, preview",
+                        image_advtab:true,
+                        toolbar_items_size : 'small',
+
+                        // Drop lists for link/image/media/template dialogs
+                        template_external_list_url : "lists/template_list.js",
+                        external_link_list_url : "lists/link_list.js",
+                        external_image_list_url : "lists/image_list.js",
+                        media_external_list_url : "lists/media_list.js",
+                    })
+
+                    $("#mysmt").click(function(){
+                        return;
+                    })
+                </script>
+              </div>
+            </div>
+      </fieldset>
+    </form>            
+</div>

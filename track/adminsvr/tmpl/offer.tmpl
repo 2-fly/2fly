@@ -1,0 +1,340 @@
+ <div class="row-fluid">
+    <ul class="nav nav-tabs">
+      <li>
+          <a href="${list_url}">List</a>
+      </li>
+      <li class="active">
+          <a href="javascript:void(0)">${title}</a>
+      </li>
+    </ul>
+</div>
+
+<div class="row-fluid">
+    <form action="" method="POST" class="form-horizontal" id="myform" enctype="multipart/form-data">
+        <input id="direct_offer_id" name="direct_offer_id" type="hidden" value="${direct_offer_id if direct_offer_id else 0}">
+        %if type(id) == int: 
+            <input type="hidden" id="id" name="id" value="${id}">
+        %endif
+        <div class="control-group">
+            ${ret}
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="name" class="control-label"><strong>Name</strong></label>
+            <div class="controls row-fluid">
+                <input type="text" name="name" id="name" value="${name if name else ""}">
+                ${tips['name'] if tips.get("name") else ""}
+            </div>
+        </div>
+        <div class="control-group" id="div_direct_type">
+            <label class="control-label" for="direct_type"><strong>Direct type</strong></label>
+            <div class="controls row-fluid">
+                <select name="direct_type" id="direct_type" class="flow-id"> </select>
+                ${tips['direct_type'] if tips.get("direct_type") else ""}
+            </div>
+        </div>
+        <div class="control-group" id="div_normal_url">
+            <label class="control-label" for="url"><strong>Url</strong></label>
+            <div class="controls row-fluid">
+                <input type="text" name="url" id="url" value="${url if url else ""}" style="width:360px">
+                ${tips['url'] if tips.get("url") else ""}
+            </div>
+        </div>
+        <div class="control-group" id="div_direct_url">
+            <label class="control-label" for="url_direct"><strong>Url</strong></label>
+            <div class="controls row-fluid">
+                <select name="url_direct" id="url_direct" class="flow-id" style="width:350px !important;"> </select>
+                ${tips['url_direct'] if tips.get("url_direct") else ""}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="country"><strong>Country</strong></label>
+            <div class="controls row-fluid">
+                <select id="country" multiple="multiple" class="flow-id" data-placeholder="Select country...">
+                    %for n,val, _ in options['country']:
+                        <option value="${val}" }>${n}</option>
+                    %endfor
+                </select>
+                <input id="country_input" type='hidden' name="country" disabled>
+                ${tips['country'] if tips.get("country") else ""}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="payout_type"><strong>Payout type</strong></label>
+            <div class="controls row-fluid">
+                <input type="text" name="payout_type" id="payout_type" value="${payout_type if payout_type else ''}">
+                ${tips['payout_type'] if tips.get("payout_type") else ""}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label"><strong>Network id</strong></label>
+            <div class="controls row-fluid">
+                <select name="network_id" id="network_id" class="flow-id"> </select>
+                <input id="network_id_input" name="network_id" value=0 class="flow-id" type="hidden">
+                <input id="admin_network_id_input" name="admin_network_id" value=0 class="flow-id" type="hidden">
+                ${tips['network_id'] if tips.get("network_id") else ""}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="introduction" class="control-label"><strong>Introduction</strong></label>
+            <div class="controls row-fluid">
+                <textarea name="introduction" id="introduction" rows="3" value="" readonly>${introduction if introduction else ""}</textarea>
+                ${tips['introduction'] if tips.get("introduction") else ""}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label"><strong>Cap Event</strong></label>
+            <div class="controls row-fluid">
+                <select name="cap" id="cap" class="flow-id"> </select>
+                ${tips['cap'] if tips.get("cap") else ""}
+            </div>
+        </div>
+        <div id="cap_event" style="display:none">
+            <div class="control-group">
+                <label class="control-label"><strong>Timezone</strong></label>
+                <div class="controls row-fluid">
+                    <select name="timezone" id="timezone" class="flow-id"> </select>
+                    ${tips['timezone'] if tips.get("timezone") else ""}
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label"><strong>Options</strong></label>
+                <div class="controls row-fluid">
+                    <select name="conv_op" id="conv_op" class="flow-id"> </select>
+                    ${tips['conv_op'] if tips.get("conv_op") else ""}
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label"><strong>Conversions</strong></label>
+                <div class="controls row-fluid">
+                    <input type="number" id="conv" name="conv" value="100">
+                    ${tips['conv'] if tips.get("conv") else ""}
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <button id="mysmt" type="button" class="k-button btn-save" value="Submit">Submit</button>
+                <a href="${list_url}" class="k-button btn-cancel" >Cancel</a>
+
+            </div>
+        </div>
+    </form>
+</div>
+<div id="loading"></div>
+
+<script src="/assets/massivaltable/jquery.select.js" type="text/javascript"/>
+<script src="/assets/admin/js/admin.js" type="text/javascript"></script>
+<script type="text/javascript" >
+    $( document ).ready( function() {
+        $("#network_id").kendoDropDownList({
+            filter:"contains",
+            dataTextField:"text",
+            dataValueField:"val",
+            optionLabel: "Select network...",
+            dataSource:[
+            %for i in options['network_id']:
+                {val:"${i['id']}", text: "${i['name']}"},
+            %endfor
+            ],
+        });
+        %if is_inner_user:
+            %if admin_network_id:
+                $("#network_id").data("kendoDropDownList").value("${admin_network_id}");
+            %endif
+        %else:
+            %if network_id:
+                $("#network_id").data("kendoDropDownList").value("${network_id}");
+            %endif
+        %endif
+
+        $("#cap").kendoDropDownList({
+            dataTextField:"text",
+            dataValueField:"val",
+            dataSource:[
+                {val:"No", text:"No"},
+                {val:"Yes", text:"Yes"},
+            ],
+            change : function(){
+                    var obj = document.getElementById("cap");
+                    if (obj.value == "Yes")
+                        document.getElementById("cap_event").style.display = "block";
+                    else
+                        document.getElementById("cap_event").style.display = "none";
+                },
+        });
+        %if cap:
+            $("#cap").data("kendoDropDownList").value("${cap}");
+            %if cap == "Yes":
+                document.getElementById("cap_event").style.display = "block";
+            %endif
+        %endif
+
+        $("#conv_op").kendoDropDownList({
+            dataTextField:"op",
+            dataValueField:"val",
+            dataSource:[
+                {val:">", op:">"},
+                {val:">=", op:">="},
+                {val:"==", op:"=="},
+                {val:"<=", op:"<="},
+                {val:"<", op:"<"},
+            ],
+        });
+        %if conv_op:
+            $("#conv_op").data("kendoDropDownList").value("${conv_op}");
+        %endif
+        %if conv:
+            document.getElementById("conv").value = "${conv}";
+        %endif
+
+        CreateTimeZoneOption("timezone");
+        $("#timezone").kendoDropDownList()
+        %if cap == "Yes":
+            $("#timezone").data("kendoDropDownList").value("${timezone}");
+        %else:
+            $("#timezone").data("kendoDropDownList").value("8");
+        %endif
+
+        <%
+        import ujson
+        tmp = []
+        for af_name in options['affiliate']['link']:
+            for v, n, op, af_type in options['affiliate']['list']:
+                if n == af_name and op == "show":
+                    for k in options['affiliate']['link'][af_name]:
+                        tmp.append({"text": options['affiliate']['link'][af_name][k]['nick'], "val":k, "typeID":str(v), "directOfferID":k})
+                    break
+        ujson.dumps(tmp)
+        %>
+
+        function OnDirectTypeSelect(e)
+        {
+            var dataItem = this.dataItem(e.item);
+            if (dataItem.typeID == "0" || dataItem.typeID == "")
+            {
+                if (dataItem.typeID == "0")
+                    document.getElementById("div_normal_url").style.display = "block";
+                else if (dataItem.typeID == "")
+                    document.getElementById("div_normal_url").style.display = "none";
+                document.getElementById("div_direct_url").style.display = "none";
+                $("#country").data("kendoMultiSelect").readonly(false);
+                $("#payout_type").removeAttr("readonly");
+                document.getElementById("payout_type").value = "";
+                $("#country").data("kendoMultiSelect").value("");
+                document.getElementById("direct_offer_id").value = 0;
+                document.getElementById("introduction").value = "";
+            }
+            else
+            {
+                document.getElementById("div_normal_url").style.display = "none";
+                document.getElementById("div_direct_url").style.display = "block";
+            }
+        }
+
+        $("#direct_type").kendoDropDownList({
+            dataTextField:"text",
+            dataValueField:"typeID",
+            optionLabel: "Select direct type...",
+            dataSource:[
+            %for n, val, op, af_type in options['affiliate']['list']:
+                %if op == "show":
+                    {typeID:"${n}", text:"${val}"},
+                %endif
+            %endfor
+            ],
+            select: OnDirectTypeSelect,
+        })
+        %if direct_type >= 0:
+            $("#direct_type").data("kendoDropDownList").value("${direct_type}");
+            %if direct_type == 0:
+                document.getElementById("div_normal_url").style.display = "block";
+                document.getElementById("div_direct_url").style.display = "none";
+            %else:
+                document.getElementById("div_normal_url").style.display = "none";
+                document.getElementById("div_direct_url").style.display = "block";
+            %endif
+        %else:
+            document.getElementById("div_normal_url").style.display = "none";
+            document.getElementById("div_direct_url").style.display = "none";
+        %endif
+
+        function OnUrlDirectSelect(e)
+        {
+            var dataItem = this.dataItem(e.item);
+            var obj = document.getElementById("direct_type");
+            if (obj.value != 0 && dataItem.val != "")
+            {
+                var od_key = dataItem.directOfferID;
+                var af_name = obj[obj.selectedIndex].innerText;
+                document.getElementById("payout_type").value = ${options}['affiliate']['link'][af_name][od_key]['ap'];
+                $("#country").data("kendoMultiSelect").value(${options}['affiliate']['link'][af_name][od_key]['country'].split(","));
+                document.getElementById("direct_offer_id").value = ${options}['affiliate']['link'][af_name][od_key]['direct_offer_id'];
+                document.getElementById("introduction").value = ${options}['affiliate']['link'][af_name][od_key]['introduction'];
+                console.log(document.getElementById("direct_offer_id"));
+                $("#country").data("kendoMultiSelect").readonly();
+                $("#payout_type").attr("readonly", "readonly");
+            }
+            else
+            {
+                $("#country").data("kendoMultiSelect").readonly(false);
+                $("#payout_type").removeAttr("readonly");
+                document.getElementById("payout_type").value = "";
+                $("#country").data("kendoMultiSelect").value("");
+                document.getElementById("direct_offer_id").value = 0;
+                document.getElementById("introduction").value = "";
+            }
+        }
+
+        $("#url_direct").kendoDropDownList({
+            filter: "contains",
+            cascadeFrom: "direct_type",
+            dataTextField:"text",
+            dataValueField:"val",
+            optionLabel: "Select direct type...",
+            dataSource: ${tmp},
+            select:OnUrlDirectSelect,
+        })
+        %if url_direct:
+            $("#url_direct").data("kendoDropDownList").value("${url_direct}");
+        %endif
+
+        var country_select = $("#country").kendoMultiSelect({
+            autoClose: false,
+            change:function () {
+                if(this.value().indexOf("GLOBAL") != -1)
+                   this.value("GLOBAL");
+            }
+        }).data("kendoMultiSelect");
+
+        %if country:
+            country_select.value("${country}".split(","));
+        %endif
+
+        %if title.lower() == "edit":
+            $("#direct_type").data("kendoDropDownList").readonly();
+            if (${direct_type} != 0)
+            {
+                $("#url_direct").data("kendoDropDownList").readonly();
+                country_select.readonly();
+                $("#payout_type").attr("readonly", "readonly");
+                $("#network_id").data("kendoDropDownList").readonly();
+                $("#url").attr("readonly", "readonly");
+            }
+        %endif
+        $("#mysmt").click(function() {
+            var country_val = $("#country").data("kendoMultiSelect").value().join(",")
+            if(country_val.length > 0)
+                $("input[name=country]").removeAttr("disabled");
+                $("input[name=country]").val(country_val);
+            var network_val = $("#network_id").val();
+            %if is_inner_user:
+                $("input[name=network_id]").val(0);
+                $("input[name=admin_network_id]").val(network_val);
+            %else:
+                $("input[name=network_id]").val(network_val);
+                $("input[name=admin_network_id]").val(0);
+            %endif
+            $("#myform").submit();
+        });
+     })
+</script>

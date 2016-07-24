@@ -1,0 +1,203 @@
+<div class="row-fluid">
+    <div id="content" class="span9">
+        <h4 id="domain">1.做域名</h4>
+        <img src="/assets/image/domain.png"></img>
+        <p>⾄至少做⼀一个track domain和⼀一个lander domain。</p>
+        <p>lander domain的话,是可以在campaign那⾥里区分使⽤用的,这样操作保证了track domain是完全不会 进⿊黑名单,然后,lander domain可以随时替换。</p>
+        <p>当然,要是你的campaign没有域名挂⿊黑的⻛风险,那设置⼀一个就⾏行了。 </p>
+        <p>添加好以后,点击verify all,会显⽰示出需要做的dns server。</p>
+        <img src="/assets/image/verify.png"></img>
+        <h4 id="ts">2.设置traffic source</h4>
+        <img src="/assets/image/ts.png"></img>
+        <p>fields 那⾥里,现在主要有三个 fields 是⽐比较有⽤用的,<br/>
+        websiteid={xxxx}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(xxxx 是每个 source 不同的 token,report 分析的主要参数之⼀)<br/>
+        tsid={xxxx}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(xxxx 是每个 source 不同的 token,是⽤用于 postback 回 traffic source ⽤用的)<br/>
+        bid={xxxx}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(xxxx 是每个 source 不同的 token,⽤用于价格传输,report 分析参数之⼀)</p>
+        <p>其他的 fields,都可以⾃自⼰己添加,只是暂时⽆无 report。但所有的元数据(每一个点击的所有的 fields)都会保存在案。所以随时想添加 report 都是可以的。</p>
+        <p>fields 格式 websiteid={xxxx}&tsid={xxxx}&bid={xxxx}</p>
+        <p>ad server domains。在campaign那⾥里,会有个ck_cloak_ts 的参数,是验证这 个ad server domains的,当流量是ad server过来的时候才会正常调整,不是的 话会cloak掉。(填主域名就⾏行了,填popads.net,那么serve.popads.net也可 以通过)</p>
+        <h4 id="offer">3.offer</h4>
+        <img src="/assets/image/offer.png"></img>
+        <p>可用参数有: <br/>
+        ${"${cid}"}, ${"${rid}"}, ${"${websiteid}"}, ${"${ip}"}, ${"${tok1}"}, ${"${tok2}"}, ${"${tok3}"}</p>
+        <p>参数那⾥里,填 aff_sub=${"${cid}"},例如<br/>
+        http://tracking.lenzmx.com/click?<br/>
+        mb_pl=android&mb_nt=xxx&mb_campid=qihoo_security_us&aff_sub=${"${cid}"}</p>
+        <p>direct type 和 url direct这⾥里,是我们跟联盟合作的直链模式。当⽤用了直链模 式,是直接⽤用⼲⼴广告主链接的,⽐比如 360是直接⽤用google play链接的,完全不⽤用 经过联盟的跳转系统。</p>
+        <h4 id="lander">4.Landing Page</h4>
+
+        <p>(1)CDN 服务,图⽚片 css js等静态⽂文件可以放在我们cdn,我们每两分钟同 步到各地节点。<br/>
+            FTP IP: 54.153.44.191<br/>
+            账户密码⼀一样。<br/>
+            在html⾥里⾯面,${"${static_dir}"} 就可以调⽤用cdn⾥里的⽂文件。<br/>
+        </p>
+        <h5>HTML变量</h5>
+        <p>在你们的 html 的源码⾥里⾯面,可以使⽤用以下各种参数:<br/>
+        ${"${lander1}"}, ${"${lander2}"}, ${"${lander3}"}...<br/>
+        ${"${offerurl1}"}, ${"${offerurl2}"}, ${"${offerurl3}"}...<br/>
+        上⾯面两组,是同⼀一个 path ⾥里⾯面,按顺序设置的 landing page 和 offer 的链接。</p>
+
+        <p>另外还有以下各种参数可以使⽤用:
+        <table>
+            <tr><td> ${"${static_dir}"}</td><td> 是每个⽤用户独⽴立存放⽂文件的⽂文件夹。</td></tr>
+            <tr> <td>${"${deviceid}"}</td><td> ⼿手机品牌型号</td><td>AppleIphone</td></tr>
+            <tr> <td>${"${brand}"}</td><td>⼿手机品牌</td><td>Apple</td></tr>
+            <tr> <td>${"${model}"}</td><td>⼿手机型号</td><td>Iphone</td></tr>
+            <tr> <td>${"${browser}"}</td><td>浏览器名称</td><td>Safari</td></tr>
+            <tr> <td>${"${browser_ver}"}</td><td>浏览器版本</td><td>8.0</td></tr>
+            <tr> <td>${"${os}"}</td><td>⼿手机系统</td><td>iOS</td></tr>
+            <tr> <td>${"${os_ver}"}</td><td>系统版本</td><td>8.3</td></tr>
+            <tr> <td>${"${country}"}</td><td>国家缩写</td><td>CN</td></tr>
+            <tr> <td>${"${country_name}"}</td><td>国家</td><td>China</td></tr>
+            <tr> <td>${"${city}"}</td><td>城市</td><td>Guangzhou</td></tr>
+            <tr> <td>${"${isp}"}</td><td>运营商</td><td>China Unicom</td></tr>
+            <tr> <td>${"${ip}"}</td><td>IP</td><td> x.x.x.x</td></tr>
+            <tr> <td>${"${ref_domain}"}</td><td>来源域名</td></tr>
+            <tr> <td>${"${track_domain}"}</td><td>当前域名</td></tr>
+        </table>
+        </p>
+        <p style="color:red">PS: 我们取消了上⼀一版的 rid=${"${rid}"},请不要添加。</p>
+        <h4 id="campaign">5.Campaign</h4>
+        <p>在新建campaign的时候，最主要的就是Flow</p>
+        <img src="/assets/image/flow.png"></img>
+        <p>Flow就是path的集合，path是landing page和offer的集合。</p>
+        <p>比如上面BR-DirectLink：</p>
+        <p>BR-prho-1这个在landing page里相当于${"${lander1}"}<br/>
+           BR-prho-2 ${"${lander}"}<br/>...</p>
+        <p>Mobvista-Hola-DirectLink这个相当于${"${offerurl1}"}<br/>
+           Mobvista-480522-Privacylock-B... ${"${offerurl2}"}<br/>
+          （这里请跟上面的Landing page的介绍一起参详。）
+        </p>
+        <p>campaign-rules</p>
+        <p>这里可以根据不同浏览器，系统，isp，国家等信息进行分流。</p>
+        <p>ck_cloak:这个建议一定要开，验证的是一个path内，不同lander的内部跳转是否当前域名，还会验证coockie信息<br/>
+           ck_cloak_html:被cloak的流量展示的页面。（请上传html文件到cdn－ftp服务器<br/>
+           ck_cloak_ts:验证流量来源是否是traffic source哪里设置ad server<br/>
+           ck_cloak_ts_html:被cloak的流量所展示的页面。（请上传html文件到cdn－ftp服务器<br/>
+           ck_android:yyan 验证是否安卓。（这个功能会被删除，请在flow里的rule设置分流<br/>
+           ck_websiteid:<br/>
+           digit:验证websiteid＝xxx的xxx是否含有数字，不含有就被cloak<br/>
+           typo:验证websiteid＝xxx里是否有{}[]等参数，含有就有cloak<br/>
+           Lander_domain_dist:这个campaign要使用的lander domain，一定要是base info那里设置的lander domain的其中一个，可以填二级域名。
+         </p>
+
+
+    </div>
+    <div class="span3 bs-docs-sidebar">
+        <ul class="nav nav-list bs-docs-sidenav affix">
+            <li><a href="#domain">domain</a></li>
+            <li><a href="#ts">traffic source</a></li>
+            <li><a href="#offer">offer</a></li>
+            <li><a href="#lander">landing page</a></li>
+            <li><a href="#campaign">campaign</a></li>
+        </ul>
+        <div style="clear:both"></div>
+    </div>
+
+
+</div>
+
+<script>
+    $(document).ready(function() {
+        //$('.bs-docs-sidebar').scrollspy();
+    })
+</script>
+
+<style>
+#content img{margin:25px 0}
+#content h4{margin:10px 0 10px; padding-top:50px; padding-bottom:20px}
+.bs-docs-sidenav {
+  width: 198px;
+  margin: 30px 0 0;
+  padding: 0;
+  background-color: #fff;
+  -webkit-border-radius: 6px;
+     -moz-border-radius: 6px;
+          border-radius: 6px;
+  -webkit-box-shadow: 0 1px 4px rgba(0,0,0,.065);
+     -moz-box-shadow: 0 1px 4px rgba(0,0,0,.065);
+          box-shadow: 0 1px 4px rgba(0,0,0,.065);
+}
+.bs-docs-sidenav > li > a {
+  display: block;
+  width: 190px \9;
+  margin: 0 0 -1px;
+  padding: 8px 14px;
+  border: 1px solid #e5e5e5;
+}
+.bs-docs-sidenav > li:first-child > a {
+  -webkit-border-radius: 6px 6px 0 0;
+     -moz-border-radius: 6px 6px 0 0;
+          border-radius: 6px 6px 0 0;
+}
+.bs-docs-sidenav > li:last-child > a {
+  -webkit-border-radius: 0 0 6px 6px;
+     -moz-border-radius: 0 0 6px 6px;
+          border-radius: 0 0 6px 6px;
+}
+.bs-docs-sidenav > .active > a {
+  position: relative;
+  z-index: 2;
+  padding: 9px 15px;
+  border: 0;
+  text-shadow: 0 1px 0 rgba(0,0,0,.15);
+  -webkit-box-shadow: inset 1px 0 0 rgba(0,0,0,.1), inset -1px 0 0 rgba(0,0,0,.1);
+     -moz-box-shadow: inset 1px 0 0 rgba(0,0,0,.1), inset -1px 0 0 rgba(0,0,0,.1);
+          box-shadow: inset 1px 0 0 rgba(0,0,0,.1), inset -1px 0 0 rgba(0,0,0,.1);
+}
+/* Chevrons */
+.bs-docs-sidenav .icon-chevron-right {
+  float: right;
+  margin-top: 2px;
+  margin-right: -6px;
+  opacity: .25;
+}
+.bs-docs-sidenav > li > a:hover {
+  background-color: #f5f5f5;
+}
+.bs-docs-sidenav a:hover .icon-chevron-right {
+  opacity: .5;
+}
+.bs-docs-sidenav .active .icon-chevron-right,
+.bs-docs-sidenav .active a:hover .icon-chevron-right {
+  background-image: url(../img/glyphicons-halflings-white.png);
+  opacity: 1;
+}
+.bs-docs-sidenav.affix {
+  top: 40px;
+}
+.bs-docs-sidenav.affix-bottom {
+  position: absolute;
+  top: auto;
+  bottom: 270px;
+}
+@media (min-width: 1200px) {
+  .bs-docs-sidenav {
+    width: 228;
+  }
+  .bs-docs-sidenav > li > a {
+    width: 210px \9; /* Override the previous IE8-9 hack */
+  }
+}
+
+@media (min-width: 768px) and (max-width: 979px) {
+  .bs-docs-sidenav {
+    top: 0;
+    width: 198;
+    margin-top: 30px;
+    margin-right: 0;
+  }
+}
+@media (max-width: 767px) {
+ .bs-docs-sidenav {
+    width: auto;
+    display: none;
+    margin-bottom: 20px;
+  }
+  .bs-docs-sidenav.affix {
+    position: static;
+    width: auto;
+    top: 0;
+  }
+}
+</style>

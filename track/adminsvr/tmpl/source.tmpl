@@ -1,0 +1,89 @@
+<div class="row-fluid">
+    <ul class="nav nav-tabs">
+      <li>
+          <a href="${list_url}">List</a>
+      </li>
+      <li class="active">
+          <a href="javascript:void(0)">${title}</a>
+      </li>
+    </ul>
+</div>
+
+<div class="row-fluid">
+    <form action="" method="POST" submit="" id="myform" class="form-horizontal" enctype="multipart/form-data">
+        %if id:
+        <input type="hidden" name="id" value="${id}">
+        %endif
+        <div class="control-group">
+            ${op_tips}
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="name" class="control-label"><strong>name</strong></label>
+            <div class="controls row-fluid">
+                <input id="name" name="name" type="text" value="${name if name else ''}">
+                ${tips.get('name', "")}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="postback_url" class="control-label"><strong>postback url</strong></label>
+            <div class="controls row-fluid">
+                <input id="name" name="postback_url" type="text" value="${postback_url if postback_url else ''}">
+                ${tips.get('postback_url', "")}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="fields" class="control-label"><strong>fields</strong></label>
+            <div class="controls row-fluid">
+                <input id="name" name="fields" type="text" value="${fields if fields else ''}">
+                ${tips.get('fields', "")}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="name" class="control-label"><strong>timezone</strong></label>
+            <div class="controls row-fluid">
+                <select id="timezone" name="timezone"></select>
+                ${tips.get('timezone', "")}
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="name" class="control-label"><strong>ad server domains</strong></label>
+            <div class="controls">
+                <div id="domains_container">
+                    <input type="hidden" name="ad_server_domains" id="ad_server_domains" value="${ad_server_domains if ad_server_domains else ""}"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="controls">
+                <input id="mysmt" type="button" class="k-button btn-save" value="Submit">
+                <a href="${list_url}" class="k-button btn-cancel">Cancel</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script>
+    $(document).ready(function() {
+        CreateTimeZoneOption("timezone");
+        %if timezone == 0 or timezone:
+            $("#timezone").val("${timezone}");
+        %endif
+        var domains = $("#domains_container").InitAddInputCompent({
+            btn_txt:"add ad domains",
+            data:$("#ad_server_domains").val(),
+         });
+
+        $("#mysmt").click(function() {
+            var ret = domains.GetValue();
+            $("#name").val($.trim($("#name").val()));
+            if(!ret.ret) {
+                return;
+            }
+            $("#ad_server_domains").val(ret.data);
+            $("#myform").submit();
+         });
+    })
+</script>

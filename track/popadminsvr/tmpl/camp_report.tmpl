@@ -1,0 +1,1343 @@
+% if event_report_list != "":
+<div class="row-fluid">
+    <ul class="nav nav-tabs">
+      ##<li>
+      ##    <a href="${event_report_list}" title="Event List">List</a>
+      ##</li>
+      <li>
+          <a href="${event_create_url}" title="Event Create">Create</a>
+      </li>
+      <li>
+          <a href="${event_config_url}" title="Event Configs">Config</a>
+      </li>
+      <li class="active">
+          <a href="javascript:void(0)" title="Event Report">Report</a>
+      </li>
+    </ul>
+</div>
+%endif
+
+<div class="row-fluid">
+      <fieldset>
+        <div class="control-group">
+          <div class="controls">
+            <input name="report_start_date" id="report_start_date"  value="${date_range_start}" class="m_top_datepicker"/>
+            <input name="report_end_date" id="report_end_date" value="${date_range_end}" class="m_top_datepicker"/>
+            <select id="report_time_zone" name="report_time_zone" class="m_top_shortcuts"></select>
+            % if len(user_list) > 0:
+            <select id="select_user_list" class="m_user_list"></select>
+            %endif
+            <input id="report_search", type="button" value="Apply" onclick=report_search() class="m_search k-button"/>
+            <div class="input-prepend input-group">
+                <input id="qs_today" name="qs_today" type="button" value="Today" onclick=quick_search(1,false) class="m_search k-button">
+                <input id="qs_yesterday" name="qs_last_one_day" type="button" value="Yesterday" onclick=quick_search(2,true) class="m_search k-button" >
+                <input id="qs_last_three_days" name="qs_last_three_days" type="button" value="Last 3 days" onclick=quick_search(3,false) class="m_search k-button">
+                <input id="qs_last_seven_days" name="qs_last_seven_days" type="button" value="Last 7 days" onclick=quick_search(7,false) class="m_search k-button">
+                % for info in tags:
+                    % if info[0] == 'datatable_campaign_tag':
+                        ##<a href="javascript:void(0)" onclick="open_updatecost_modal()" role="button" class="btn m_top_shortcuts" data-toggle="modal">update_cost</a> 
+                        ##<input type="button" value="UpdateCost" onclick="open_updatecost_modal()" class="m_top_shortcuts" data-toggle="modal"> 
+                    % endif
+                    % if info[0] == 'datatable_total_tag':
+                        <input type="button" value="Download" onclick="download_file()" class="m_top_shortcuts"> 
+                    %endif
+                % endfor
+            </div>
+          </div>
+        </div>
+    </fieldset>
+</div>
+
+##<hr/>
+<div id="loadpagediv" class="loadpagediv">
+</div>
+
+${report_str}
+${updatecost_str}
+<script src="/assets/admin/js/report.js"></script>
+
+<style >
+    form#window {
+        padding:20px 0;
+    }
+    form#window *{
+        box-sizing:border-box;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+    }
+
+    .form-control-label{
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        padding:7px 15px 0px 15px;
+        line-height:20px;
+    }
+
+    .k-state-selected a{
+        color:#c6c6c6;
+    }
+    .loadpagediv
+    {
+        display:none;
+        position:absolute;
+        top:50%;
+        left:50%;
+        width:15%;
+        height:20%;
+        text-align:center;
+        background-color:rgba(256,256,256,0.1);
+        background-image:url('/assets/image/loading.gif');
+        background-repeat:no-repeat;
+        background-position:center;
+        border:0px solid white;
+        color:black;
+        z-index:5000;
+    }
+    th, td { white-space: nowrap; }
+    td.highlight_green
+    {
+        font-weight: bold;
+        color: green;
+    }
+    td.highlight_red
+    {
+        font-weight: bold;
+        color: red;
+    }
+    .dataTables_wrapper .dataTables_filter {
+      float: left;
+      text-align: left;
+    }
+    .dataTables_wrapper .dataTables_length {
+      float: left;
+      margin-left:3.0em;
+    }
+    .dataTables_wrapper .dataTables_paginate {
+      float: left;
+      text-align: left;
+      margin-left:3.0em;
+    }
+    .m_top_datepicker{
+        margin-top:10px;
+        margin-left:5px;
+    }
+    .m_search{
+        margin-top:10px;
+        margin-left:5px;
+        background-color:#ffffff;
+        border-style:solid;
+        border-width:1px;
+        border-color:#cccccc;
+    }
+    .m_top_shortcuts{
+        margin-top:10px;
+        margin-left:8px;
+        background-color:#ffffff;
+    }
+    .m_filter_table{
+        margin-left:10px;
+    }
+    .m_user_list{
+        margin-top:10px;
+        margin-left:5px;
+        width:150px;
+    }
+
+</style>
+
+<script>
+
+    var table_tags = {},
+        table_items = {},
+        tagle_sorts = {},
+        table_sort_format = {},
+        table_op = {},
+        table_args = {}
+        table_column_format = {},
+        table_cpname2cpid = {},
+        cpid = 0;
+
+    function changeHtmlText(tag, trs_html)
+    {
+        document.getElementById(tag).innerHTML = trs_html;
+    }
+
+    $(document).ready(function ()
+    {
+        %if "cpid" in args:
+            cpid = ${args['cpid']};
+        %endif
+        function startChange()
+        {
+            var startDate = start.value(),
+                endDate = end.value();
+            if (startDate)
+            {
+                startDate = new Date(startDate);
+                startDate.setDate(startDate.getDate());
+                end.min(startDate);
+            }
+            else if (endDate)
+            {
+                startDate.max(new Date(endDate));
+            }
+            else
+            {
+                endDate = new Date();
+                start.max(endDate);
+                end.min(endDate);
+            }
+        }
+
+        function endChange()
+        {
+            var endDate = end.value(),
+                startDate = start.value();
+            if (endDate)
+            {
+                endDate = new Date(endDate);
+                endDate.setDate(endDate.getDate());
+                start.max(endDate);
+            }
+            else if (startDate)
+            {
+                end.min(new Date(startDate));
+            }
+            else
+            {
+                endDate = new Date();
+                start.max(endDate);
+                end.min(endDate);
+            }
+        }
+
+        var start = $("#report_start_date").kendoDatePicker({
+                change : startChange
+            }).data("kendoDatePicker");
+        var end = $("#report_end_date").kendoDatePicker({
+                change : endChange 
+            }).data("kendoDatePicker");
+        start.max(end.value());
+        end.min(start.value());
+
+        % if len(user_list) > 0:
+            $("#select_user_list").kendoDropDownList({
+                filter:"contains",
+                dataTextField:"text",
+                dataValueField:"val",
+                dataSource:[
+                    % for _info in user_list:
+                        {val:"${_info[0]}", text:"${_info[1]}"},
+                    %endfor 
+                ],
+            })
+            $("#select_user_list").data("kendoDropDownList").value("${user_id}");
+        % endif
+        init_timezone();
+        $("#report_time_zone").kendoDropDownList()
+        init_checkbox();
+
+        var start_str = document.getElementById("report_start_date").value;
+        var end_str = document.getElementById("report_end_date").value;
+        var time_str = start_str + " - " + end_str;
+        refreshChartNormal(time_str, ${args.get("cpid",-1)}, "${args.get("d_oid_name", 'empty')}", ${args.get("oid",-1)}); 
+  });
+
+  function init_timezone()
+  {
+      CreateTimeZoneOption("report_time_zone");
+      var opts = document.getElementById("report_time_zone").getElementsByTagName("option");
+      var index = ${timezone} + 12;
+      if (opts.length > index)
+      {
+        opts[index].selected = true;
+      }
+  }
+
+  function report_search()
+  {
+      var cpid = ${args.get("cpid", -1)};
+      var d_oid_name = "${args.get("d_oid_name", 'empty')}"
+      var oid = ${args.get("oid",-1)};
+      var start_str = document.getElementById("report_start_date").value;
+      var end_str = document.getElementById("report_end_date").value;
+      var time_str = start_str + ' - ' + end_str;
+      refreshChartNormal(time_str, cpid, d_oid_name, oid);
+  }
+
+  function get_date_format(date, format)
+  {
+      var result = (date.getMonth() + 1) + format + date.getDate() + format + date.getFullYear();
+      return result;
+  }
+
+
+
+  function quick_search(days, single)
+  {
+      var cpid = ${args.get("cpid", -1)};
+      var d_oid_name = "${args.get("d_oid_name", 'empty')}"
+      var oid = ${args.get("oid",-1)};
+      var time_str = '';
+      var start_times = 0;
+      var end_times = 0;
+      var start_str = "";
+      var end_str = "";
+      if (!single)
+      {
+          var date = new Date();
+          end_times = date.getTime() / 1000;
+          start_times = end_times - 3600 * 24 * (days-1);
+          end_str = get_date_format(date, '/');
+          start_str = get_date_format(new Date(start_times*1000), '/');
+          time_str = start_str + ' - ' + end_str;
+      }
+      else
+      {
+          var date = new Date();
+          var now = date.getTime() / 1000;
+          start_times = now - 3600 * 24 * (days-1);
+          end_times = start_times;
+          start_str = get_date_format(new Date(start_times*1000), '/');
+          end_str = start_str;
+          time_str = start_str + ' - ' + end_str;
+      }
+      document.getElementById("report_start_date").value = start_str;
+      document.getElementById("report_end_date").value = end_str;
+      refreshChartNormal(time_str, cpid, d_oid_name, oid);
+  }
+
+
+    function add_request_args(jsonurl, key)
+    {
+        var value = document.getElementById(key).value;
+        jsonurl += '&' + key + '=' + encodeURIComponent(value);
+        return jsonurl;
+    }
+
+    function refreshChartByUpdatecost(time_str)
+    {
+        var jsonurl = '';
+        jsonurl = '/api/summary.json?type=' + encodeURIComponent("update_cost");
+        jsonurl += '&time=' + encodeURIComponent(time_str);
+        jsonurl = add_request_args(jsonurl, "campaign_id");
+        jsonurl = add_request_args(jsonurl, "start_date");
+        jsonurl = add_request_args(jsonurl, "end_date");
+        jsonurl = add_request_args(jsonurl, "start_hour");
+        jsonurl = add_request_args(jsonurl, "end_hour");
+        jsonurl = add_request_args(jsonurl, "cost");
+        jsonurl = add_request_args(jsonurl, "choose_time_zone");
+        jsonurl +='&tags=' + encodeURIComponent(make_tag_args());
+        refreshChart(jsonurl, time_str);
+    }
+
+    function make_tag_args()
+    {
+        var checkbox_list = ${args.get("checkbox", [])};
+        var tags_str = '';
+        if (checkbox_list.length > 0) {
+            for (var idx in checkbox_list)
+            {
+                var name = checkbox_list[idx];
+                var obj = document.getElementById(name);
+                if (obj.checked)
+                {
+                    tags_str = tags_str + "datatable_" + name;
+                    tags_str += ",";
+                }
+            }
+        } else {
+            var tag_list = [];
+            % for info in tags:
+                tag_list.push("${info[1]}");
+            %endfor
+         }
+         return tag_list.join(",");
+    }
+
+    function refreshChartNormal(time_str, cpid, d_oid_name, oid)
+    {
+        var timezone = document.getElementById("report_time_zone").value;
+        var jsonurl = '/api/summary.json?type=' + encodeURIComponent("normal");
+        jsonurl +='&tags=' + encodeURIComponent(make_tag_args());
+        jsonurl += '&cpid=' + encodeURIComponent(cpid);
+        jsonurl += '&d_oid_name=' + encodeURIComponent(d_oid_name);
+        jsonurl += '&oid=' + encodeURIComponent(oid);
+        jsonurl += '&timezone=' + encodeURIComponent(timezone);
+        % if len(user_list) > 0:
+            var username = $("#select_user_list option:selected").text()
+            jsonurl += '&username=' + encodeURIComponent(username);
+        % endif
+        if (time_str != '')
+        {
+            jsonurl += '&time=' + encodeURIComponent(time_str);
+        }
+        else
+        {
+        }
+        refreshChart(jsonurl, time_str);
+    }
+
+    function do_download_file(url, name)
+    {
+        var link = document.createElement("a");
+        link.download = name;
+        link.href = url;
+        link.click();
+    }
+
+    function download_file()
+    {
+        var start_str = document.getElementById("report_start_date").value;
+        var end_str = document.getElementById("report_end_date").value;
+        var time_str = start_str + ' - ' + end_str;
+        var timezone = document.getElementById("report_time_zone").value;
+
+        var jsonurl = '/api/download_file.json?time=' + encodeURIComponent(time_str);
+        jsonurl += '&timezone=' + encodeURIComponent(timezone);
+        var result = $.getJSON(jsonurl, function(data){
+                do_download_file(data["url"], data["name"]);
+            });
+    }
+
+    function onSelect(arg, tag)
+    {
+        if (tag == "datatable_campaign")
+        {
+            var grid = $("#"+tag).data("kendoGrid");
+            var selectedItem = grid.dataItem(grid.select());
+            var cpid = selectedItem.cpid;
+            var name = selectedItem.Campaign;
+            document.getElementById("campaign_name").innerText = name;
+            document.getElementById("campaign_id").value = cpid;
+        }
+    }
+
+    function pre_sort(x)
+    {
+        var a = x.replace("$", "");
+        a = a.replace("%", "");
+        a = parseFloat(a.replace(/,/g, ""));
+        return a;
+    }
+
+    function sort_column(a, b, k)
+    {
+        k = "Views";
+        var a1 = pre_sort(a[k]);
+        var b1 = pre_sort(b[k]);
+        return a1 - b1;
+    }
+
+    function get_col_fomat_color(tag, format_cols, index, bd)
+    {
+        for (var i = 0; i < format_cols.length; i++)
+        {
+            var col = format_cols[i]["col"];
+            if(tag == "datatable_website"){
+                col++;
+            }
+            var reg = format_cols[i]["reg"];
+            if (index == col)
+            {
+                var v = parseFloat(bd);
+                if (v > 0.0)
+                    return "green";
+                else if (v < 0.0)
+                    return "red";
+                else
+                    return "black";
+            }
+        }
+        return "black";
+    }
+
+    function make_columns_format(tag)
+    {
+        var columns = []
+        if(tag == "datatable_website") {
+            columns.push({title:"", template:'<input type="checkbox" class="chkbx" />', width:"30px", headerTemplate: '<input type="checkbox" id="select-all" />'})
+        }
+        var hidden = table_items[tag]["hidden"];
+        var format = table_items[tag]["format"];
+        var filter = table_items[tag]["filter"];
+        var head = table_items[tag]["head"];
+        var table_bottom =  table_items[tag]["bottom_static"];
+        var format_cols = table_column_format[tag];
+        var has_bottom_data = table_bottom.length > 0 ? true : false;
+        var hyperlink = {
+        };
+        var filter_link_tag = ["datatable_campaign", "datatable_offer", "datatable_event_campaign_report", "datatable_event_offer_report", "datatable_event_valve_offer_report"];
+        for (var i = 0; i < head.length; i++)
+        {
+            var col = {}
+            col["field"] = head[i];
+            if ($.inArray(i, hidden) >= 0)
+            {
+                col["hidden"] = true;
+            }
+            else
+            {
+                if (has_bottom_data)
+                {
+                    if (format.hasOwnProperty(head[i]))
+                    {
+                        var color = get_col_fomat_color(format_cols, i, table_bottom[0][head[i]]);
+                        col["footerTemplate"] = "<font color=\""+ color + "\"> #= kendo.format(\"{0:" + format[head[i]] + "}\"," + table_bottom[0][head[i]].toString() + ")#</font>";
+                    }
+                    else
+                        col["footerTemplate"] = table_bottom[0][head[i]].toString();
+                }
+            }
+            if (format.hasOwnProperty(head[i]))
+            {
+                if(format[head[i]] == "custom") {
+                    col["template"] = kendo.template($("#"+head[i]).html())
+                } else {
+                    col["format"] = "{0:" + format[head[i]] + "}";
+                }
+            }
+            if (hyperlink.hasOwnProperty(head[i]))
+            {
+                if ($.inArray(tag, filter_link_tag) < 0)
+                {
+                    template_tmpl = hyperlink[head[i]];
+                    col["template"] = kendo.template($(template_tmpl).html());
+                }
+            }
+            if (filter.hasOwnProperty(i))
+            {
+                col["filterable"] = {
+                    "cell" : {"operator":filter[i]}
+                }
+            }
+            else
+            {
+                col["filterable"] = false;
+            }
+            if(["Date", 'Hour', "Campaign", "Website", 'OS', 'Country', 'Browser'].indexOf(head[i]) >= 0) {
+                col['width'] = 180;
+                if(head[i] == "Campaign" && tag == "datatable_website") {
+                    col['template'] = "<a href='/poponads/rtbcampaign/edit?id=#=cpid#' target='_blank'>#=Campaign#</a>";
+                }
+            } else if("ImageUrl" == head[i]) {
+                col['template'] = kendo.template($("#image-url-tmpl").html());
+                col['width'] = 250;
+            } else {
+                col['width'] = 90;
+            }
+            columns.push(col);
+        }
+        return columns;
+    }
+
+    function addStatic(total, head, source)
+    {
+        var len = head.length;
+        for (var i = 1; i < len; ++i)
+        {
+            if (head[i] == "Price") {
+                total[head[i]] = source[head[i]];
+            } else {
+                var data_type = typeof source[head[i]];
+                if (data_type == "string")
+                    total[head[i]] = "";
+                else if (data_type == "number")
+                    total[head[i]] = total[head[i]] + source[head[i]];
+                else
+                    total[head[i]] = "";
+            }
+        }
+        return total;
+    }
+
+    function calTotalStatic(total)
+    {
+        if (total['Views'] != 0)
+        {
+            total['CPM'] = 1000*total['Cost'] / total['Views'];
+            total['CTR'] = total['Clicks'] / total['Views'];
+            total['CV'] = total['Convs'] / total['Views'];
+            total['EPM'] = 1000*total['Revenue'] / total['Views'];
+        }
+
+        if (total['Cost'] != 0.0)
+        {
+            total['ROI'] = total['Profit'] / total['Cost'];
+        }
+
+        if (total['Clicks'] != 0)
+        {
+            total['CR'] = total['Convs'] / total['Clicks'];
+            total['EPC'] = 1000*total['Revenue'] / total['Clicks'];
+        }
+
+        if (total['Convs'] != 0)
+        {
+            total['AP'] = total['Revenue'] / total['Convs'];
+        }
+        return total;
+    }
+
+    function onDataBound(arg, tag, time_str, grid)
+    {
+        var len = arg.sender.tbody[0].childNodes.length;
+        var head = table_items[tag]["head"];
+        var format = table_items[tag]["format"];
+        var format_cols = table_column_format[tag];
+        var total = {}
+        total[head[0]] = 'Total';
+        for (var i = 1; i < head.length; ++i)
+        {
+            total[head[i]] = 0;
+        }
+        for (var i = 0; i < len; i++)
+        {
+            var row = arg.sender.tbody[0].childNodes[i];
+            make_col_format2(tag, table_column_format[tag], row, arg.sender._data[i]);
+            make_hytext(tag, time_str, row, arg.sender._data[i]);
+            total = addStatic(total, head, arg.sender._data[i]);
+        }
+
+        if (arg.sender.footer.length <= 0)
+            return;
+        calTotalStatic(total);
+        var len2 = arg.sender.footer[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes.length;
+        for (var i = 1; i < len2; ++i) {
+            var j = i;
+            if(tag == "datatable_website"){
+                j -=1;
+            }
+            var color = get_col_fomat_color(tag, format_cols, i, total[head[j]]);
+            var d = kendo.toString(total[head[j]], format[head[j]]);
+            var html = "<font color='"+ color + "'>" + d + "</font>";
+            arg.sender.footer[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[i].innerHTML = html;
+        }
+        var view = grid.dataSource.view();
+        for(var i = 0; i < view.length;i++){
+            if(checkedIds[view[i].id]){
+                grid.tbody.find("tr[data-uid='" + view[i].uid + "']")
+                .addClass("k-state-selected")
+                .find(".chkbx")
+                .attr("checked","checked");
+            }
+        }
+        var tag_map = select_page_map[tag];
+        if(tag_map && tag_map[arg.sender.dataSource.page()]) {
+            var selected = tag_map[arg.sender.dataSource.page()];
+            $("#"+tag).find("#select-all")[0].checked = selected;
+        } else {
+            var chkbx = $("#"+tag).find("#select-all")[0];
+            if(chkbx) {
+                chkbx.checked = false;
+            }
+        }
+    }
+
+    function onBottomDataBound(arg, tag)
+    {
+        var len = arg.sender.tbody[0].childNodes.length;
+        for (var i = 0; i < len; i++)
+        {
+            var row = arg.sender.tbody[0].childNodes[i];
+            make_col_format2(tag, table_column_format[tag], row, arg.sender._data[i]);
+        }
+    }
+
+    function make_top_page(tag)
+    {
+        var grid = $("#"+tag).data("kendoGrid");
+        if (typeof grid.pagerTop == "undefined")
+        {
+            var wrapper = $('<div class="k-pager-wrap k-grid-pager pagerTop"/>').insertBefore(grid.element.children("table"));
+            grid.pagerTop = new kendo.ui.Pager(wrapper, $.extend({}, grid.options.pageable, { dataSource: grid.dataSource }));
+            grid.element.height("").find(".pagerTop").css("border-width", "0 0 1px 0");
+        }
+    }
+
+    function make_default_sort(data)
+    {
+        var result = [];
+        for (var i = 0; i < data.length; i++)
+        {
+            var tmp = {
+                field : data[i][0],
+                dir : data[i][1],
+            };
+            result.push(tmp);
+        }
+        return result;
+    }
+
+
+    var checkedIds = {};
+
+    function selectRow() {
+        var checked = this.checked,
+            row = $(this).closest("tr"),
+            grid = $("#datatable_website").data("kendoGrid"),
+            dataItem = grid.dataItem(row);
+        checkedIds[dataItem.Website] = checked;
+        if (checked) {
+            row.addClass("k-state-selected");
+            } else {
+            row.removeClass("k-state-selected");
+        }
+    }
+
+    function getSchema(tag) {
+        if(tag == "datatable_website"){
+            var head = table_items[tag]["head"];
+            var field = {};
+            change_data = [];
+            for(var i in head) {
+                field[head[i]] = {editable:false, nullable:true};
+            }
+            field.Bid = {validation:{required:false}};
+            field.Budget = {validation:{required:false}};
+            return {
+                model:{
+                    id:"website",
+                    fields:field
+                },
+            };
+        }
+        return {};
+    };
+
+    function getEditable(tag) {
+        if(tag == "datatable_website") {
+            return true;
+        }
+    }
+
+    function getEditHandler(tag) {
+        if(tag == "datatable_website") {
+            return function(e) {
+                if(e.action == "itemchange") {
+                    change_data = change_data.concat(e.items);
+                }
+            }
+        }
+    }
+
+    function refreshChart(jsonurl, time_str)
+    {
+      loadPage(true);
+      var result = $.getJSON(jsonurl, function(data){
+        table_tags = data['table_data']['tags'];
+        table_items = data['table_data']['items'];
+        var charts = data['table_data']['charts'];
+        table_op = data['table_data']['op'];
+        table_column_format = data['table_data']['format'];
+
+        remove_datatable();
+        remove_charts();
+        for (var indx=0;indx<table_tags.length;++indx)
+        {
+            var tag = table_tags[indx];
+            if (${show_title})
+                add_datatable(tag, tag.substr(10, tag.length-10));
+            else
+                add_datatable(tag, "");
+            var pageSize = 10;
+            if (table_op[tag]["paging"][1].length > 0)
+            {
+                pageSize = table_op[tag]["paging"][1][1][0];
+            }
+            var grid = $('#'+tag);
+            var dataSource = new kendo.data.DataSource({
+                data : table_items[tag]["data"],
+                pageSize : pageSize,
+                sort : make_default_sort(table_items[tag]["default_sort"]),
+                schema: getSchema(tag),
+                batch:true,
+                change:getEditHandler(tag),
+            })
+
+
+            if(table_items[tag]['tips'].length > 0) {
+                $("#"+tag+'tips').text(table_items[tag]['tips']);
+                $("#"+tag+'tips').css({'margin-top':"20px", 'font-weight':'bold'});
+            }
+            
+            grid.kendoGrid({
+                dataSource: dataSource,
+                pageable : {
+                    numeric : true,
+                    pageSizes : table_op[tag]["paging"][1][1],
+                    buttonCount : 5,
+                },
+                filterable: {
+                    extra: false,
+                    operators: {
+                        string: {
+                            contains: "Contains",
+                            eq: "Equals",
+                        }
+                    }
+                },
+                toolbar : make_toolbar(tag),
+                selectable : true,
+                editable: getEditable(tag),
+                change : function (arg){onSelect(arg, tag)},
+                sortable : true,
+                resizable : true,
+                columns : make_columns_format(tag),
+                dataBound : dataBoundHandler(tag, time_str),
+            });
+            if (tag == "datatable_website") {
+                select_page_map[tag] = {};
+                grid.data("kendoGrid").table.on("click", "input.chkbx", selectRow);
+
+                grid.find("#select-all").click(function(e) {
+                    var selected = e.target.checked;
+                    var page = $("#datatable_website").data("kendoGrid").dataSource.page();
+                    var a = $("#datatable_website").find("input.chkbx");
+                    $("#datatable_website").find("input.chkbx").each(function(i, v) {
+                        if($(v)[0].checked != selected) {
+                            $(v).click();
+                        }
+                    })
+                    select_page_map["datatable_website"][page] = selected;
+                });
+                grid.find("#add-include").kendoButton({
+                    click:function() {
+                        var checked = [];
+                        for(var i in checkedIds){
+                            if(checkedIds[i]){
+                                checked.push(i);
+                            }
+                        }
+                        if(checked.length <= 0) {
+                            return;
+                        }
+                        change_website_list("add-include", cpid, checked);
+                    }
+                });
+                grid.find("#rm-include").kendoButton({
+                    click:function() {
+                        var checked = [];
+                        for(var i in checkedIds){
+                            if(checkedIds[i]){
+                                checked.push(i);
+                            }
+                        }
+                        if(checked.length <= 0) {
+                            return;
+                        }
+                        change_website_list("rm-include", cpid, checked);
+                    }
+                });
+                grid.find("#add-exclude").kendoButton({
+                    click:function() {
+                        var checked = [];
+                        for(var i in checkedIds){
+                            if(checkedIds[i]){
+                                checked.push(i);
+                            }
+                        }
+                        if(checked.length <= 0) {
+                            return;
+                        }
+                        change_website_list("add-exclude", cpid, checked);
+                    }
+                });
+                grid.find("#filter-condition").kendoButton({
+                    click:function() {
+                        $("#window").data("kendoWindow").open();
+                        $("#filter-condition").fadeOut();
+                    }
+                });
+                grid.find("#clear-condition").kendoButton({
+                    click:function() {
+                        var grid = $("#datatable_website").data("kendoGrid");
+                        var dataSource = new kendo.data.DataSource({
+                            data : table_items['datatable_website']["data"],
+                            pageSize : 20,
+                            sort : make_default_sort(table_items['datatable_website']["default_sort"]),
+                        })
+                        grid.setDataSource(dataSource);
+                        checkedIds = {};
+                    }
+                });
+                grid.find("#update-bid").kendoButton({
+                    click:function() {
+                        if(change_data.length == 0) {
+                            return;
+                        }
+                        var data = [];
+                        for(var i in change_data) {
+                            w_data = change_data[i];
+                            data.push(w_data.website + ":" + w_data.Bid +":"+ w_data.Budget);
+                        }
+                        var s = data.join(",");
+                        var post_data = {"cpid":cpid, "data":data}
+
+                        var url = "/poponads/change/website/bid";
+                        $.post(url, post_data, function(ret_data) {
+                            if(ret_data.ret) {
+                                var theGrid = $("#datatable_website").data("kendoGrid");
+                                theGrid.refresh();
+                                change_data = []
+                            }
+                        });
+                    }
+                });
+                $("#window").kendoWindow({
+                    width: "800px",
+                    title: "About Alvar Aalto",
+                    visible: false,
+                    actions: [ "Pin", "Minimize", "Maximize", "Close" ],
+                    close: onClose
+                }).data("kendoWindow").center();
+                $("#mysmt").click(function() {get_filter_datasource()});
+
+                var dropdownlist = $("#datatable_website").find("#category").kendoDropDownList({
+                    dataTextField: "text",
+                    dataValueField: "value",
+                    dataSource:{
+                        data:[{text:'Exclude', value:"0"}, {text:'Include', value:"1"}, {text:'All', value:-1} ]
+                    },
+                    select: function(e) {
+                        var item = this.dataItem(e.item)
+                        var val = parseInt(item.value);
+                        if (val == 1) {
+                            if( table_items['datatable_website'].args.has_include){
+                                $("#datatable_website").data("kendoGrid").dataSource.filter({ field: "clude", operator: "eq", value: 1});
+                            } else {
+                                $("#datatable_website").data("kendoGrid").dataSource.filter({ field: "clude", operator: "neq", value: 0});
+                            }
+                        } else if(val == 0) {
+                            $("#datatable_website").data("kendoGrid").dataSource.filter({ field: "clude", operator: "eq", value: 0});
+                        } else {
+                            $("#datatable_website").data("kendoGrid").dataSource.filter({});
+                        }
+                    }
+                }).data("kendoDropDownList");
+                dropdownlist.select(1);
+                if( table_items['datatable_website'].args.has_include){
+                    $("#datatable_website").data("kendoGrid").dataSource.filter({ field: "clude", operator: "eq", value: 1});
+                } else {
+                    $("#datatable_website").data("kendoGrid").dataSource.filter({ field: "clude", operator: "neq", value: 0});
+                }
+
+            }
+            if(tag == "datatable_banner") {
+                var tooltip = grid.kendoTooltip({
+                    filter: "a.image-url",
+                    position: "right",
+                    content: function(e) {
+                        var tr = e.target.closest("tr");
+                        var dataItem = $("#datatable_banner").data("kendoGrid").dataItem(tr);
+                        var html = "<img src='"+dataItem.ImageUrl+"'>";
+                        return html;
+                    },
+                }).data("kendoTooltip");
+            }
+            initChart(charts, tag)
+        }
+        loadPage(false);
+      });
+    };
+
+    function change_website_list(op_type, cpid, list) {
+        list = encodeURIComponent(list.join(","));
+        var url = "/poponads/change/campaign/website?cpid="+cpid+"&op_type="+op_type+"&list="+list;
+        $.getJSON(url, function(data) {
+            if(data.ret) {
+                location.reload();
+            }
+        });
+    }
+
+    function get_filter_datasource() {
+        var hours = $("#latest-hour").val(),
+        max_views = $("#views-max").val(),
+        min_views = $("#views-min").val(),
+        max_visits = $("#visits-max").val(),
+        min_visits = $("#visits-min").val(),
+        max_ctr = $("#ctr-max").val(),
+        min_ctr = $("#ctr-min").val();
+        if(!hours || hours.trim().length == 0) {
+            $("#latest-hour").parent().addClass("has-error")
+            return
+        }
+        var url = "/poponads/report/filter/website?cpid="+cpid+"&hour=" + hours;
+        if(max_views && max_views.trim().length) { url += "&max_Views=" + max_views; }
+        if(min_views && min_views.trim().length) { url += "&min_Views=" + min_views; }
+        if(max_visits && max_visits.trim().length) { url += "&max_Visits=" + max_visits; }
+        if(min_visits && min_visits.trim().length) { url += "&min_Visits=" + min_visits; }
+        if(max_ctr && max_ctr.trim().length) { url += "&max_CTR=" + max_ctr; }
+        if(min_ctr && min_ctr.trim().length) { url += "&min_CTR=" + min_ctr; }
+        var result = $.getJSON(url, function(data){
+            data = data.data;
+            grid = $("#datatable_website").data("kendoGrid");
+            var dataSource = new kendo.data.DataSource({
+                data : data,
+                pageSize : 10,
+                sort : make_default_sort(table_items['datatable_website']["default_sort"]),
+            })
+            grid.setDataSource(dataSource);
+            checkedIds = {};
+            $("#window").data("kendoWindow").close();
+        });
+    }
+
+    function onClose() {
+        $("#filter-condition").fadeIn();
+    }
+
+    function make_toolbar(tag) {
+        if(tag == "datatable_website") {
+            return kendo.template($("#website-tb-tmp").html());
+        }
+        return null
+    }
+
+    select_page_map = {};
+
+    function dataBoundHandler(tag, time_str) {
+        f = function(arg) {
+            onDataBound(arg, tag, time_str, this);
+            initPjaxTag($("a[data-pjax]"), "#content-inner");
+        }
+        return f;
+    }
+
+    function initChart(charts, tag) {
+        var chart_datas = charts[tag].charts;
+        if(chart_datas.length > 0) {
+            add_chart(tag + "_div", "");
+            var div = "#" + tag + "_div",
+                container = div + "_container";
+            $(div).append("<button type='button' id='"+tag+"_toggle'>Collapse Chart</button>");
+            $("#"+tag+"_toggle").kendoButton();
+            $("#"+tag+"_toggle").click(function() {
+                if($(container).is(":hidden")) {
+                    $(this).text("Collapse Chart");
+                    $(container).show(800);
+                } else {
+                    $(this).text("Expand Chart");
+                    $(container).hide(800);
+                }
+            });
+            $(div).append("<div style='margin:15px 0 0;' id='" + tag + "_div_container'></div>");
+            var chartIds = [];
+            if(charts[tag].items && charts[tag].items.length) {
+                var ul = '<ul class="inline"><li><select style="width:300px" id="' +tag+'_dropdown"></select></li>\
+                    <li style="vertical-align:top;"><button class="btn" type="button" id="'+tag+'_filter">filter</button></li>\
+                    <li style="vertical-align:top;"><button class="btn" type="button" id="'+tag+'_clear">clear</button></li></ul>';
+                $(container).append(ul);
+                var select = $("#"+tag+"_dropdown").kendoMultiSelect({
+                    autoClose:false,
+                    filter: "contains",
+                    tagMode:"single",
+                    tagTemplate: kendo.template($("#tagTemplate").html()),
+                    placeholder: "Select Campaigns...",
+                    dataTextField: "text",
+                    dataValueField: "text",
+                    dataSource: charts[tag].items,
+                }).data("kendoMultiSelect");
+
+                $("#"+tag+"_filter").click(function() {
+                    var filters = [];
+                    var cpnames = select.value();
+
+                    $.each(cpnames, function(_, cpname) {
+                        filters.push({field:"name", operator:"eq", value:cpname});
+                    })
+                    var filter = {filters:filters, logic:"or"};
+                    $.each(chartIds, function(i, e) {
+                        $("#"+e).data("kendoChart").dataSource.filter(filter);
+                    });
+                });
+                $("#"+tag+"_clear").click(function() {
+                    select.value([]);
+                    $.each(chartIds, function(i, e) {
+                        $("#"+e).data("kendoChart").dataSource.filter({});
+                    });
+                });
+            }
+            for(var n = 0; n < chart_datas.length; n++) {
+                var chart = chart_datas[n]
+                var id = tag+n;
+                $(container).append("<div id='"+id+"'></div>");
+                $("#"+id).kendoChart({
+                        dataSource:{
+                            data:chart['data'],
+                            group:{field:"name"},
+                            sort:chart['sort'],
+                        },
+                        theme:"bootstrap",
+                        title: {
+                            text: chart['title'],
+                        },
+                        legend: {
+                            position: "bottom"
+                        },
+                        seriesDefaults: {
+                            type: "line",
+                            style:"smooth",
+                        },
+                        series:[{field:"value"}],
+                        categoryAxis: {
+                            field:"time",
+                            majorGridLines: { visible: false },
+                            labels: { rotation: "auto" }
+                        },
+                        tooltip: {
+                            visible: true,
+                            template: "#= series.name #: #= value #"
+                        }
+                 });
+                chartIds.push(id);
+            };
+        }
+    }
+
+    function make_col_format2(tag, format_cols, row, data)
+    {
+        for (var i = 0; i < format_cols.length; i++)
+        {
+            var col = format_cols[i]["col"],
+                col2 = col;
+            if(tag == "datatable_website") {
+                col2 += 1;
+            }
+            var reg = format_cols[i]["reg"]
+            var h = table_items[tag]["head"][col];
+            var v = data[h]
+            if (parseFloat(v) > 0.0)
+            {
+                $('td', row).eq(col2).addClass('highlight_green');
+            }
+            else if (parseFloat(v) < 0.0)
+            {
+                $('td', row).eq(col2).addClass('highlight_red');
+            }
+        }
+    }
+
+    function make_col_format(tag, format_cols, row, data)
+    {
+        for (var i in format_cols)
+        {
+            var col = format_cols[i]["col"]
+            var reg = format_cols[i]["reg"]
+            var v = data[col].replace(reg, '');
+            if (parseFloat(v) > 0.0)
+            {
+                $('td', row).eq(col).addClass('highlight_green');
+            }
+            else if (parseFloat(v) < 0.0)
+            {
+                $('td', row).eq(col).addClass('highlight_red');
+            }
+        }
+    }
+
+    function make_hytext(tag, time_str, row)
+    {
+        if (tag == "datatable_campaign" || tag == "datatable_event_campaign_report")
+        {
+            var index = 0;
+            if (tag == "datatable_event_campaign_report")
+                index = 1;
+            var timezone = document.getElementById("report_time_zone").value;
+            var name = row.childNodes[index].innerHTML;
+            var len = row.childNodes.length;
+            var cpid = row.childNodes[len-1].innerText;
+            var username = $("#select_user_list option:selected").text();
+            row.childNodes[index].innerHTML = "<a data-pjax href=\"campaign/date?username=" + username +"&time_str=" + time_str + "&cpid=" + cpid + "&timezone=" + timezone +"\">" + name + " </a>"
+        } else if (tag == "datatable_event_offer_report" || tag == "datatable_event_valve_offer_report" || tag == "datatable_offer")
+        {
+            var index = 1;
+            var timezone = document.getElementById("report_time_zone").value;
+            var name = row.childNodes[index].innerHTML;
+            var len = row.childNodes.length;
+            var oid= row.childNodes[len-1].innerText;
+            //var username = $("#select_user_list option:selected").text();
+            var username = "";
+            row.childNodes[index].innerHTML = "<a data-pjax target='_blank' href=\"offer?username=" + username +"&time_str=" + time_str + "&oid=" + oid + "&timezone=" + timezone +"\">" + name + " </a>"
+        }
+    }
+
+    function make_campaign_hytext(tag, time_str, row, data)
+    {
+        if (tag == "datatable_campaign")
+        {
+            var name = row.childNodes[0].innerHTML;
+            row.childNodes[0].innerHTML = "<a href=\"campaign/date?time_str=" + time_str + "&cpid=" + table_cpname2cpid[tag][name] + "\">" + name +" </a>"
+        }
+    }
+
+    function make_cpname2id(tag, items)
+    {
+        if (tag != "datatable_campaign")
+            return;
+
+        table_cpname2cpid[tag] = {}
+        for (var i in items)
+        {
+            var len = items[i].length - 1;
+            table_cpname2cpid[tag][items[i][0]] = items[i][len];
+        }
+    }
+
+    function cal(obj)
+    {
+        return "Total";
+    }
+    function make_table_callback(table, tag)
+    {
+        $('#'+tag+' tbody').on( 'click', 'tr', function ()
+        {
+            if ( $(this).hasClass('selected') )
+            {
+                $(this).removeClass('selected');
+                if (tag == "datatable_campaign")
+                {
+                    document.getElementById("campaign_name").innerText= "";
+                    document.getElementById("campaign_id").value = -1;
+                }
+            }
+            else 
+            {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+                if (tag == "datatable_campaign")
+                {
+                    var name = this.childNodes[0].innerText;
+                    document.getElementById("campaign_name").innerText = name;
+                    document.getElementById("campaign_id").value = table_cpname2cpid[tag][name];
+                }
+            }
+         });
+    }
+
+    function loadPage(is_block)
+    {
+        if (!is_block)
+        {
+            document.getElementById('loadpagediv').style.display = "none";
+        }
+        else
+        {
+            document.getElementById('loadpagediv').style.display = "block";
+        }
+    }
+
+    
+
+    function init_checkbox()
+    {
+        var checkbox_list = ${args.get("checkbox", [])};
+        if (checkbox_list.length > 0)
+        {
+            var default_list = ${args.get("checkbox_default", [])};
+            for (var i in default_list)
+            {
+                var _id = checkbox_list[default_list[i]];
+                var obj = document.getElementById(_id);
+                obj.checked = true;
+            }
+        }
+    }
+</script>
+<script id="image-url-tmpl" type="text/x-kendo-tmpl">
+#if(ImageUrl == "Unknow" || !isNaN(ImageUrl)) {#
+    #=ImageUrl#
+#} else {#
+#var tmp = ImageUrl.split("/")#
+#var image = tmp[tmp.length - 1]#
+    <a href="\#" class="image-url">#=image#</a>
+#}#
+</script>
+
+<script id="tagTemplate" type="text/x-kendo-template">
+    # if (values.length < 3) { #
+        # for (var idx = 0; idx < values.length; idx++) { #
+            #:values[idx]#
+            # if (idx < values.length - 1) {#, # } #
+        # } #
+    # } else { #
+       #:values.length# items selected out of #:maxTotal#
+    # } #
+</script>
+
+<script id="BudgetRate" type="text/x-kendo-tmpl">
+    #var c = "black";#
+    #if(BudgetRate >= 0.9){#
+        # c = "red";#
+    #}else if(BudgetRate >= 0.8){#
+        # c = "orange";#
+    #}else{#
+    #}#
+    #var budget = kendo.toString(BudgetRate, "p2");#
+    <font color=#=c#>#=budget#</font>
+</script>
+
+<script id="CBudget" type="text/x-kendo-tmpl">
+    #var tmpList = CBudget.split("_");#
+    #var percent = parseFloat(tmpList[0]);#
+    #var c = tmpList[1];#
+    #var budget = kendo.toString(percent, "p2");#
+    <font color=#=c#>#=budget#</font>
+</script>
+
+<script type="text/x-kendo-template" id="website-tb-tmp">
+    <div class="flow-fluid" style="padding:5px">
+        <button type=button id="add-include">Add Include</button>
+        <button type=button id="rm-include">Remove Include</button>
+        <button type=button id="add-exclude">Add Exclude</button>
+        <form id="window" class="form-horizontal">
+              <div class="form-group">
+                <label for="latest-hour" class="col-sm-2 control-label">Latest Hours</label>
+                <div class="col-sm-9">
+                  <input id="latest-hour" class="form-control form-control-input" placeholder="latest hours to filter...">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="views-max" class="col-sm-2 control-label">Views</label>
+                <div class="col-sm-9 clearfix">
+                  <label class="pull-left form-control-label" >Max : </label>
+                  <input id="views-max" class="pull-left form-control form-control-input" style="width:80px" placeholder="max...">
+                  <label class="pull-left form-control-label" style="pedding:7px 15px 0 15px;line-height:20px">Min : </label>
+                  <input id="views-min" class="pull-left form-control form-control-input" style="width:80px" placeholder="max...">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="visits-max" class="col-sm-2 control-label">Visits</label>
+                <div class="col-sm-9 clearfix">
+                  <label class="pull-left form-control-label" >Max : </label>
+                  <input id="visits-max" class="pull-left form-control form-control-input" style="width:80px" placeholder="max...">
+                  <label class="pull-left form-control-label" style="pedding:7px 15px 0 15px;line-height:20px">Min : </label>
+                  <input id="visits-min" class="pull-left form-control form-control-input" style="width:80px" placeholder="max...">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="ctr-max" class="col-sm-2 control-label">CTR</label>
+                <div class="col-sm-9 clearfix">
+                  <label class="pull-left form-control-label" >Max : </label>
+                  <input id="ctr-max" class="pull-left form-control form-control-input" style="width:80px" placeholder="max...">
+                  <label class="pull-left form-control-label" style="pedding:7px 15px 0 15px;line-height:20px">Min : </label>
+                  <input id="ctr-min" class="pull-left form-control form-control-input" style="width:80px" placeholder="max...">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button type="button" id="mysmt" class="btn btn-default">Filter</button>
+                </div>
+              </div>
+        </form>
+        <button type=button id="filter-condition">Filter</button>
+        <button type=button id="clear-condition">Clear Filter</button>
+        <button type=button id="update-bid">Update Bid</button>
+        <div class="pull-right">
+            <input type="search" id="category" class='pull-right' style="width: 150px"/>
+            <label class="pull-right" style="line-height:30px" for="category">Show products by category:</label>
+        </div>
+    </div>
+</script>

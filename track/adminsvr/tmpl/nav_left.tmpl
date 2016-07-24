@@ -1,0 +1,50 @@
+<div>
+    <div id="nav-div">
+    </div><!--/.well -->
+    <div style="clear:both">
+    </div>
+</div><!--/.well -->
+
+<script type="text/javascript">
+    var nav_str = '<ul id="nav">\
+        % for item in nav_left:
+        %if item.get('href'):
+            <li>\
+             <a href="${item['href']}"><img src="${item['img']}"></img>${item['name']}</a>\
+             </li>\
+        %else:
+            <li class="k-state-active"><img src="${item['img']}"></img>${item['name']}\
+                % for item_name, item_value, active in item['items']:
+                % if info and info.get(item_name, 0):
+                    <div><div class="${"li-active-bg" if active else "li-bg"}"><div class="li-content"><a style="position:relative" href="${item_value}">${item_name}<span style="color:red!important">(${info[item_name]})</span>\
+                    <div style="width:6px;height:6px;background-color:red;border-radius:50%;position:absolute;top:0px;left:-3px"></div>\
+                % else:
+                    <div><div class="${"li-active-bg" if active else "li-bg"}"><div class="li-content"><a style="position:relative" href="${item_value}">${item_name}\
+                %endif
+                </a></div></div></div>\
+                % endfor
+            </li>\
+        %endif
+        % endfor
+    </ul>'
+    $(document).ready( function() {
+        $("#nav-div").append(nav_str);
+        $("#nav").kendoPanelBar({ });
+   });
+</script>
+<style>
+    #nav { border:none!important}
+    #nav li {clear:both}
+    #nav *{ font-size:16px;color:#fff!important}
+    #nav .k-image { margin-top:12px!important; margin-right:10px!important;}
+    #nav .k-header { box-shadow:none!important;height:44px;background-color:#2d3b50!important;background-image:none!important;color:#fff!important;line-height:44px!important;border-top:none;border-left:none;border-right:none;border-bottom:1px!important; }
+    #nav .k-content {border:none!important;}
+    #nav .li-bg { background-color:#253143;height:44px;color:#fff; }
+    #nav .li-active-bg {background-color:#4682B4;}
+    #nav .li-bg:hover{background-color:#4682B4}
+    #nav .k-content .li-content{ margin-left:35px;border-left:1px solid #364760;line-height:44px;height:44px;padding-left:20px; }
+    #nav .k-content a{ color:#fff!important; width:100%; height:100%;text-decoration:none;}
+    #nav-div ul{height:auto;}
+    #nav .k-i-arrow-n {right:10px;margin-top:-6px;width:12px;height:12px;background-image:url("/assets/image/menu-fold.png")!important;background-size:12px 12px!important;background-position:0% 0%!important;}
+    #nav .k-i-arrow-s {right:10px;margin-top:-6px;width:12px;height:12px;background-image:url("/assets/image/menu-unfold.png")!important;background-size:12px 12px!important;background-position:0% 0%!important;}
+</style>

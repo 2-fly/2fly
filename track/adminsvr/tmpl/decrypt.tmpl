@@ -1,0 +1,18 @@
+<div style="float:left;width:1000px">
+    <div id="encode_field" style="float:left;width:50%">
+        <form action="" method="POST" class="admin-form form-horizontal" enctype="multipart/form-data">
+            <textarea type="text" class="" id="encode_list" name="encode_list" style="width:90%;height:500px" onblur="">${encrypt}</textarea>
+            <div>
+                <input id="submit" type="submit" name="submit" class="k-button btn-save" value="decrypt" style="margin-top:10px">
+            </div>
+        </form>
+    </div>
+    <div id="decode_field" style="float:right;width:50%">
+        <form action="" method="POST" class="admin-form form-horizontal" enctype="multipart/form-data">
+            <textarea type="text" class="" id="decode_list" name="decode_list" style="width:90%;height:500px" onblur="">${decrypt}</textarea>
+            <div>
+                <input id="submit2" type="submit" name="submit" class="k-button btn-save" value="encrypt" style="margin-top:10px">
+            </div>
+        </form>
+    </div>
+</div>

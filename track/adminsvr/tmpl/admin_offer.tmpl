@@ -1,0 +1,317 @@
+ <div class="row-fluid">
+    <ul class="nav nav-tabs">
+      <li>
+          <a href="${list_url}">List</a>
+      </li>
+      <li class="active">
+          <a href="javascript:void(0)">${title}</a>
+      </li>
+    </ul>
+</div>
+
+<div class="row-fluid">
+    <form action="" method="POST" class="form-horizontal" id="myform" enctype="multipart/form-data">
+        %if type(id) == int: 
+            <input type="hidden" id="id" name="id" value="${id}">
+        %endif
+        <div class="control-group">
+            ${ret}
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="name" class="control-label"><strong>Name</strong></label>
+            <div class="controls row-fluid">
+                <input type="text" name="name" id="name" value="${name if name else ""}">
+                ${tips['name'] if tips.get("name") else ""}
+            </div>
+        </div>
+        <div class="control-group" id="div_direct_type">
+            <label class="control-label" for="direct_type"><strong>Direct type</strong></label>
+            <div class="controls row-fluid">
+                ##<input type="text" name="direct_type" id="direct_type">
+                <select name="direct_type" id="direct_type" class="flow-id"> </select>
+                ${tips['direct_type'] if tips.get("direct_type") else ""}
+            </div>
+        </div>
+        <div class="control-group" id="div_normal_url">
+            <label class="control-label" for="url"><strong>Url</strong></label>
+            <div class="controls row-fluid">
+                <input type="text" name="url" id="url" value="${url if url else ""}">
+                ${tips['url'] if tips.get("url") else ""}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="country"><strong>Country</strong></label>
+            <div class="controls row-fluid">
+                <select id="country" multiple="multiple" style="width:220px" data-placeholder="Select country...">
+                    %for n,val, _ in options['country']:
+                        <option value="${val}" }>${n}</option>
+                    %endfor
+                </select>
+                <input id="country_input" type='hidden' name="country" disabled>
+                ${tips['country'] if tips.get("country") else ""}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="payout_type"><strong>Payout type</strong></label>
+            <div class="controls row-fluid">
+                <input type="text" name="payout_type" id="payout_type" value="${payout_type if payout_type else ''}">
+                %if title.lower() == "edit":
+                    <button type="button" class="editButton" id="update_payout">update</button>
+                %endif
+                ${tips['payout_type'] if tips.get("payout_type") else ""}
+            </div>
+            <div class="controls row-fluid">
+                ${tips['current_payout_type'] if tips.get("current_payout_type") else ""}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="state"><strong>State</strong></label>
+            <div class="controls row-fluid">
+                <select name="state" id="state" class="flow-id"> </select>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="introduction" class="control-label"><strong>Introduction</strong></label>
+            <div class="controls row-fluid">
+                <textarea name="introduction" id="introduction" rows="3" value="">${introduction if introduction else ""}</textarea>
+                ${tips['introduction'] if tips.get("introduction") else ""}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label"><strong>Cap Event</strong></label>
+            <div class="controls row-fluid">
+                <select name="cap" id="cap" class="flow-id"> </select>
+                ${tips['cap'] if tips.get("cap") else ""}
+            </div>
+        </div>
+        <div id="cap_event" style="display:none">
+            <div class="control-group">
+                <label class="control-label"><strong>Timezone</strong></label>
+                <div class="controls row-fluid">
+                    <select name="timezone" id="timezone" class="flow-id"> </select>
+                    ${tips['timezone'] if tips.get("timezone") else ""}
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label"><strong>Options</strong></label>
+                <div class="controls row-fluid">
+                    <select name="conv_op" id="conv_op" class="flow-id"> </select>
+                    ${tips['conv_op'] if tips.get("conv_op") else ""}
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label"><strong>Conversions</strong></label>
+                <div class="controls row-fluid">
+                    <input type="number" id="conv" name="conv" value="100">
+                    ${tips['conv'] if tips.get("conv") else ""}
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <button id="mysmt" type="button" class="k-button btn-save" value="Submit">Submit</button>
+                <a href="${list_url}" class="k-button btn-cancel" >Cancel</a>
+            </div>
+        </div>
+    </form>
+</div>
+<div id="loading"></div>
+
+<div id="updatepayoutModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <h4>${name}</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row-fluid">
+                <h6>last 5 history update</h6>
+                <div>
+                    <table id="history_payout" style="width:300px;text-align:center;">
+                    </table>
+                </div>
+                </br>
+
+                <div class="control-group">
+                    <label class="control-label" for="modal_start_time" class="control-label"><strong>start time</strong></label>
+                    <div class="controls row-fluid">
+                        <input type="text" name="modal_start_time" id="modal_start_time" value="">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="modal_timezone" class="control-label"><strong>timezone</strong></label>
+                    <div class="controls row-fluid">
+                        <select id="modal_timezone" name="modal_timezone"></select>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="modal_payout" class="control-label"><strong>payout</strong></label>
+                    <div class="controls row-fluid">
+                        <input type="text" id="modal_payout" name="modal_payout" value="">
+                    </div>
+                </div>
+        </div>
+    </div>
+        
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">close</button>
+        <input class="btn btn-primary" type="button" value="update" id="modal_update_payout">
+    </div>
+</div>
+
+<script src="/assets/massivaltable/jquery.select.js" type="text/javascript"/>
+<script src="/assets/admin/js/admin.js" type="text/javascript"></script>
+<script type="text/javascript" >
+    $( document ).ready( function() {
+        $("#direct_type").kendoDropDownList({
+            dataTextField:"text",
+            dataValueField:"typeID",
+            optionLabel: "Select direct type...",
+            dataSource:[
+            %for n, val, op, af_type in options['affiliate']['list']:
+                %if n != 0 and op == "show":
+                    {typeID:"${n}", text:"${val}"},
+                %endif
+            %endfor
+            ],
+        })
+        %if direct_type:
+            $("#direct_type").data("kendoDropDownList").value("${direct_type}");
+        %endif
+
+        var country_select = $("#country").kendoMultiSelect({
+            autoClose: false,
+            change:function () {
+                if(this.value().indexOf("GLOBAL") != -1)
+                   this.value("GLOBAL");
+            }
+        }).data("kendoMultiSelect");
+
+        %if country:
+            country
+            country_select.value("${country}".split(","));
+        %endif
+
+        $("#cap").kendoDropDownList({
+            dataTextField:"text",
+            dataValueField:"val",
+            dataSource:[
+                {val:"No", text:"No"},
+                {val:"Yes", text:"Yes"},
+            ],
+            change : function(){
+                    var obj = document.getElementById("cap");
+                    if (obj.value == "Yes")
+                        document.getElementById("cap_event").style.display = "block";
+                    else
+                        document.getElementById("cap_event").style.display = "none";
+                },
+        });
+        %if cap:
+            $("#cap").data("kendoDropDownList").value("${cap}");
+            %if cap == "Yes":
+                document.getElementById("cap_event").style.display = "block";
+            %endif
+        %endif
+
+        $("#conv_op").kendoDropDownList({
+            dataTextField:"op",
+            dataValueField:"val",
+            dataSource:[
+                {val:">", op:">"},
+                {val:">=", op:">="},
+                {val:"==", op:"=="},
+                {val:"<=", op:"<="},
+                {val:"<", op:"<"},
+            ],
+        });
+        %if conv_op:
+            $("#conv_op").data("kendoDropDownList").value("${conv_op}");
+        %endif
+        %if conv:
+            document.getElementById("conv").value = "${conv}";
+        %endif
+
+        CreateTimeZoneOption("timezone");
+        $("#timezone").kendoDropDownList()
+        %if cap == "Yes":
+            $("#timezone").data("kendoDropDownList").value("${timezone}");
+        %else:
+            $("#timezone").data("kendoDropDownList").value("8");
+        %endif
+
+        $("#state").kendoDropDownList({
+            dataTextField:"val",
+            dataValueField:"state",
+            optionLabel: "Select offer state...",
+            dataSource:[
+                    {state:"0", val:"put on"},
+                    {state:"1", val:"pull off"},
+            ],
+        })
+        %if state == 0 or state == 1:
+            $("#state").data("kendoDropDownList").value("${state}");
+        %endif
+
+        %if title.lower() == "edit":
+            $("#direct_type").data("kendoDropDownList").readonly();
+            //country_select.readonly();
+            $("#payout_type").attr("readonly", "readonly");
+            //$("#url").attr("readonly", "readonly");
+        %endif
+
+        $("#mysmt").click(function() {
+            var country_val = $("#country").data("kendoMultiSelect").value().join(",")
+            if(country_val.length > 0)
+                $("input[name=country]").removeAttr("disabled");
+                $("input[name=country]").val(country_val);
+            $("#myform").submit();
+        });
+
+        $(".editButton").kendoButton({
+            spriteCssClass: "k-icon k-edit"
+        });
+
+        $("#update_payout").click(function(){
+            open_updatepayout_modal();
+        });
+
+        $("#modal_start_time").kendoDateTimePicker({
+            value:new Date(),
+        });
+        CreateTimeZoneOption("modal_timezone");
+        $("#modal_timezone").kendoDropDownList();
+        $("#modal_timezone").data("kendoDropDownList").value(8);
+
+        $("#modal_update_payout").click(function(){
+            var picker = $("#modal_start_time").data("kendoDateTimePicker");
+            var date = new Date(picker.value());
+            var jsonurl = "/api/update_payout.json?id=" + encodeURIComponent(${id});
+            jsonurl += "&start_time=" + encodeURIComponent(parseInt(date.getTime()/1000));
+            jsonurl += "&timezone=" + encodeURIComponent($("#modal_timezone").val());
+            jsonurl += "&payout=" + encodeURIComponent($("#modal_payout").val());
+            var result = $.getJSON(jsonurl, function(data){
+            });
+            $('#updatepayoutModal').modal('hide');
+        });
+     })
+
+     function open_updatepayout_modal()
+     {
+         $('#updatepayoutModal').modal('show');
+         var jsonurl = "/api/update_payout_history.json?id=" + encodeURIComponent(${id});
+         var result = $.getJSON(jsonurl, function(data){
+             var history = document.getElementById("history_payout");
+             var html = "<tr><td>start time</td><td>timezone</td><td>payout</td><tr>";
+             for (var i in data["offers"])
+             {
+                 var obj = data["offers"][i];
+                 var h = "<tr>"
+                 for (var j in obj)
+                    h += "<td>" + obj[j] + "</td>"
+                h += "</tr>";
+                html += h;
+             }
+             history.innerHTML = html;
+         });
+     }
+
+</script>

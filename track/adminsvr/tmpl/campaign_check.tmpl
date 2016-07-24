@@ -1,0 +1,72 @@
+<div class="row-fluid">
+    <ul class="nav nav-tabs actions-nav">
+        <li>
+            <a href="${list_url}">List</a>
+        </li>
+
+        <li>
+            <a href="${create_url}" title="Create new record">Create</a>
+        </li>
+
+        <li class="active">
+            <a href="javascript:void(0)" title="Check Campaign">Check</a>
+        </li>
+    </ul>
+</div>
+
+<div class="m_div">
+    <label class="m_label">missing campaign htmls</label>
+    <div id="campaign_htmls_grid" class="m_table"></div>
+</div>
+<div class="m_div">
+    <label class="m_label">missing lander htmls</label>
+    <div id="lander_htmls_grid" class="m_table"></div>
+</div>
+<div class="m_div">
+    <label class="m_label">invalid lander vars</label>
+    <div id="lander_vars_grid" class="m_table"></div>
+</div>
+<div class="m_div">
+    <label class="m_label">missing lander assets</label>
+    <div id="lander_assets_grid" class="m_table"></div>
+</div>
+
+<style>
+    .m_div{
+        margin-top:30px;
+    }
+    .m_label{
+        font-size:30px;
+        text-align:center;
+    }
+    .m_table{
+        margin-top:10px;
+        color:red;
+    }
+</style>
+<script>
+    $(document).ready(function(){
+        createCampaignCheckTable("campaign_htmls_grid", ${campaign_htmls}, ${cp_head});
+        createCampaignCheckTable("lander_htmls_grid", ${lander_htmls}, ${lh_head});
+        createCampaignCheckTable("lander_assets_grid", ${lander_assets}, ${la_head});
+        createCampaignCheckTable("lander_vars_grid", ${lander_vars}, ${lv_head});
+    });
+    function createCampaignCheckTable(_id, _data, head)
+    {
+        var grid = $('#'+_id);
+        grid.kendoGrid({
+                dataSource :{
+                    data : _data,
+                    pageSize : 10,
+                },
+                pageable : {
+                    numeric : true,
+                    pageSizes : [10, 20, 50, "All"],
+                    buttonCount : 5,
+                },
+                columns : head,
+                sortable : true,
+                resizable : true,
+            });
+    }
+</script>

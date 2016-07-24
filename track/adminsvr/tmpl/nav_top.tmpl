@@ -1,0 +1,72 @@
+<div class="navbar navbar-inverse navbar-fixed-top navbar-custom">
+    <div class="navbar-inner">
+        <div class="container-fluid">
+            <a class="brand" href="/"><img src="/assets/image/massival-logo.png"></img></a>
+            <div style="height:44px;position:relative;">
+                <a id="nav-left-collapse"></a>
+                    <div class="user-menu pull-right">
+                      <ul id="menu" class="user-menu-ul">
+                        <li>
+                          <a class="dropdown-toggle container" data-toggle="dropdown" href="#">
+                            <div style="display:inline-block;position:relative;width:85px;height:30px;">
+                              <img src="/assets/image/login-user-icon@2x.png">
+                              <span style="position:absolute;left:35px">${username}</span>
+                              %if msg_num:
+                              <div style="width:6px;height:6px;background-color:red;border-radius:50%;position:absolute;top:3px;left:3px"></div>
+                              %endif
+                            </div>
+                          </a>
+                          <ul>
+                                <li><a href="/logout">Logout</a></li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </div>
+                </div> <!--/.nav-collapse -->
+            </div>
+        </div> <!-- container-fluid -->
+    </div> <!-- navbar-inner  -->
+</div> <!-- div navbar -->
+
+<script>
+    $(document).ready(function() {
+       $("#nav-left-collapse").click(function() {
+            if($(".nav-left").css('display') == "none") {
+                $("#nav-left-collapse").css('background-image', 'url("/assets/image/nav-fold.png")');
+                $("#main-body").removeClass("span11");
+                $("#main-body").addClass("span9");
+            } else {
+                $("#nav-left-collapse").css('background-image', 'url("/assets/image/nav-unfold.png")');
+                $("#main-body").removeClass("span9");
+                $("#main-body").addClass("span11");
+            }
+            $(".nav-left").toggle();
+            return false;
+         });
+
+       $("#menu").kendoMenu();
+  });
+</script>
+<style>
+#nav-left-collapse{z-index:1049;cursor:pointer;float:left;background-image:url("/assets/image/nav-fold.png");width:20px;height:20px;border:none;background-color:#fff;margin:-10px 0 0 10px;top:50%;position:absolute}
+.navbar-custom .brand { width:250px;height:44px;background-color:#364760;padding:0px;margin-left:0px;-moz-box-shadow: 0px 10px 5px rgba(0,0,0,0.1);box-shadow: 0px 10px 5px rgba(0,0,0,0.1);}
+.navbar-custom .brand img{ width:160px;height:26px;top:50%;margin:-13px auto auto;display:block;position:relative; }
+.navbar-custom .navbar-inner {background-image:none;background-color:#fff;padding:0px; -moz-box-shadow: 0px 10px 5px rgba(0,0,0,0.1);box-shadow: 0px 10px 5px rgba(0,0,0,0.1);border:none}
+
+.user-menu{height:100%;margin:0 40px 0 0;background-color:#fff}
+.user-menu-ul{height:42px;margin:0 40px 0 0;background-color:#fff;}
+.user-menu ul{width:140px}
+.user-menu ul li{margin:0 40px 0 0;width:100%}
+.user-menu ul li a{padding:0 20px;line-height:30px!important}
+.user-menu ul li a{padding:0 20px;line-height:30px!important;position:relative}
+.user-menu img{position:absolute;width:30px;height:30px}
+.user-menu .container{height:30px;padding:6px 15px!important;line-height:30px!important;width:110px;vertical-align:middle!important;}
+.user-menu .k-icon{margin-top:-20px!important}
+@media (max-width: 979px) {
+    .navbar-custom .brand { width:250px;height:44px;background-color:#364760;padding:0px;margin:0px;}
+    .navbar-fixed-top{ margin:0px; }
+    .pull-right {float:right}
+    body{ padding:0px;}
+}
+</style>
+

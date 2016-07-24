@@ -1,0 +1,489 @@
+<!-- Modal -->
+<div id="ruleModal" class="modal hide fade large-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Rules</h3>
+  </div>
+  <div class="modal-body">
+    <div id="hidden_input"></div>
+    <div class="dropdown">
+        <button id="rule_dropdown" class="btn dropdown-toggle" id="dLabel" role="button" data-toggle="dropdown" data-target="#">
+            <div style="min-width:100px;margin:0" class="inline">Add rule<b class="caret inline"></b></div>
+        </button>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+            %for i in rule_config.rule_type:
+            <li class="option" id="rule_dropdown_${i['name']}" ><span>${i['name']}</span></li>
+            %endfor
+        </ul>
+    </div>
+    <div id="cur_modal_indx" value="0"></div>
+    <div class="accordion admin-accordion" id="rule_container">
+
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Exit</button>
+    <button type="button" class="btn btn-primary" id="create_rule" data-dismiss="modal" aria-hidden="true">Save</button>
+  </div>
+</div>
+
+<link rel="stylesheet" href="/assets/telerik/styles/kendo.common.min.css" />
+<link rel="stylesheet" href="/assets/telerik/styles/kendo.bootstrap.min.css" />
+
+<script src="/assets/telerik/js/kendo.all.min.js"></script>
+<script type="text/javascript">
+    var top_cate = {},
+    ruls = {},
+    sec_cate = {},
+    sec_cate_conf = {},
+    rule_id = {},
+    rule_swap = ${rules},
+    rule_num = 0,
+    pannel_num = {},
+    condition_prefix = "rule_condition_",
+    match_prefix = "rule_match_",
+    rule_ret = {},
+    callback = [];
+
+    function init_rule_id(n) {
+        return {
+            pannel_id:"rule"+n+"_pannel", add_laner:"add_rule"+n+"_lander", new_lander:"new_rule"+n+"_lander",
+            lander_container:"rule"+n+"_lander_container", offer_container:"rule"+n+"_offer_container",
+            add_offer:"add_rule"+n+"_offer", new_offer:"new_rule"+n+"_offer", icon_prefix:"rule"+n+"_icon_",
+            offer_select:"rule_"+n+"_offerselect", lander_select:"rule_"+n+"_landerselect", ban_icon:"rule"+n+"_icon_",
+            add_path_btn_id:"add_rule_"+n+"_path", condition_id:condition_prefix+n
+        };
+    }
+
+    function get_rule(rule_n) {
+        $.ajax({
+            async:false,
+            url:"${get_rule_url}", 
+            type:"GET",
+            data:{id:$("#campaign_id").val(), index:rule_n},
+            success: function(data) {
+                rule_ret[rule_n] = JSON.parse(data);
+                load_rule_modal(rule_ret[rule_n]);
+            }
+        })
+    }
+
+    function load_rule_modal(rules) {
+        $("#rule_container").empty();
+        for(var i in rules) {
+            click_arg.data = rules[i];
+            $("#rule_dropdown_"+rules[i][0].type_name).click();
+            click_arg.data = [];
+        }
+        $("#ruleModal").modal('toggle');
+    }
+    var cur_modal_indx = -1;
+
+    function add_rule_title(parent_id, i, rule_n){
+        var btn = $("<button class='btn' type=button >"+rule_swap[i].title+"</button>");
+        $("#"+parent_id).append(btn);
+        btn.click(function() {
+            $("#cur_modal_indx").attr("value", rule_id[rule_n].condition_id);
+            cur_modal_indx = rule_n;
+            if(!rule_ret[rule_n]) {
+                get_rule(rule_n);
+            }
+            else {
+                load_rule_modal(rule_ret[rule_n]);
+            }
+        })
+    }
+    
+    function is_new_rule_path(id){
+        for(var i in rule_swap) {
+            for(var j in rule_swap[i].match_swap.paths) {
+                if(rule_swap[i].match_swap.paths[j].path_id == id)
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    function init_rule_swap(rule_n, input_val) {
+        rule_id[rule_n] = init_rule_id(rule_n);
+        add_swap_pannel('rule_pannel', rule_id[rule_n].pannel_id, rule_id[rule_n].add_path_btn_id);
+
+        add_hidden_input("hidden_input", rule_id[rule_n].condition_id, input_val);
+        $("#"+rule_id[rule_n].add_path_btn_id).bind("click", function() {
+            add_path_div(rule_id[rule_n], pannel_num[rule_n], exist_rule_path_ids[rule_n]);
+            pannel_num[rule_n]++;
+        });
+    }
+    
+    var exist_rule_path_ids = {};
+    
+    function get_rule_path_id(n) {
+        while(true) {
+            var num = pannel_num[n]++;
+            if(exist_rule_path_ids.indexOf(num) == -1)
+                return num
+        }
+    }
+
+
+    
+    <%
+        import ujson
+        t = rule_config.rule_type
+        rule_type = ujson.dumps(t)
+    %>
+    var rule_type = ${rule_type},
+    click_arg = {data:[]}
+
+    $(document).ready(function() {
+        $("#ruleModal").on("hidden", function(event) {
+           $("#rule_container").empty()
+           callback = [];
+           cur_modal_indx = -1;
+       });
+        //for(var i in rule_swap) {
+        //    var rule_paths = rule_swap[i].match_swap.paths;
+        //    for(var j in rule_paths)
+        //        exist_rule_path_ids.push(rule_paths[j].path_id);
+        //}
+            
+        for(var i in rule_swap) {
+            pannel_num[rule_num] = 1;
+            add_rule_title('rule_pannel', i, rule_num);
+            init_rule_swap(rule_num, JSON.stringify(rule_swap[i].condition));
+            var rule_paths = rule_swap[i].match_swap.paths;
+            exist_rule_path_ids[i] = [];
+            
+            for(var j in rule_paths){
+                add_path_div(rule_id[rule_num], pannel_num[rule_num], exist_rule_path_ids[i], rule_paths[j].lander, rule_paths[j].offer, rule_paths[j].path_id);
+                pannel_num[rule_num]++;
+            }
+            rule_num++;
+        }
+
+        function get_rule_conf(id) {
+            for(var k in sec_cate_conf) {
+                for(var i in sec_cate_conf[k]){
+                    for(var j in sec_cate_conf[k][i]){
+                        if(sec_cate_conf[k][i][j].id == id)
+                            return sec_cate_conf[k][i][j]
+                    }
+                }
+            }
+            return null
+        }
+
+
+        $("#create_rule").click(function() {
+            var n = cur_modal_indx;
+            if(cur_modal_indx == -1) {
+                pannel_num[rule_num] = 1;
+                rule_id[rule_num] = init_rule_id(rule_num);
+                add_swap_pannel('rule_pannel', rule_id[rule_num].pannel_id, rule_id[rule_num].add_path_btn_id);
+                n = rule_num;
+                exist_rule_path_ids[n] = [];
+
+                add_hidden_input("hidden_input", rule_id[rule_num].condition_id);
+                add_hidden_input("hidden_input", match_prefix + rule_num);
+                $("#"+rule_id[rule_num].add_path_btn_id).bind("click", function() {
+                    add_path_div(rule_id[n], pannel_num[n], exist_rule_path_ids[n]);
+                    pannel_num[n]++;
+                });
+                add_path_div(rule_id[rule_num], pannel_num[rule_num], exist_rule_path_ids[n]);
+                pannel_num[rule_num]++;
+                n = rule_num++;
+            }
+
+            var ret_rules = [];
+            for(var i in callback){
+                var r = callback[i].func.apply(undefined, callback[i].args);
+                if(r.error_msg) {
+                    alert(r.error_msg);
+                    return false;
+                }
+                ret_rules.push(r);
+            }
+
+            var rule_ret_new = [];
+            for(var i in ret_rules) {
+                var tmp = [];
+                var rules = ret_rules[i].rules;
+                for (var j in rules) {
+                    var tmp_ret = get_rule_conf(rules[j]);
+                    if( tmp_ret)
+                        tmp.push(tmp_ret);
+                }
+                rule_ret_new.push(tmp);
+            }
+
+            rule_ret[n] = rule_ret_new;
+            $("#"+rule_id[n].condition_id).val(JSON.stringify(ret_rules));
+            cur_modal_indx = -1;
+        });
+        var count = {};
+
+        %for i in rule_config.rule_type:
+            count['${i['name']}'] = 0;
+            $("#rule_dropdown_${i['name']}").click(click_arg, function(e) {
+               $("#rule_dropdown").dropdown('toggle');
+               var n = count['${i['name']}'];
+               var name = '${i['name']}';
+               var div_name = ["collapse", name, n].join("_");
+               var close_btn_name = ["close", name, n].join("_");
+               var content_div_name = [name, n].join("_");
+               var inner_div_name = ["inner", name, n].join("_");
+               add_collapse("rule_container", div_name, content_div_name, close_btn_name, inner_div_name, name);
+               %if i['type'] == 1: 
+                   if(!sec_cate_conf[name]) 
+                       sec_cate_conf[name] = {};
+                   top_cate[content_div_name] = parse_li(${rule_config.rule_first_category[i['id']]});
+                   sec_cate[content_div_name] = {};
+                   add_inner_1(content_div_name, inner_div_name);
+
+                   var ul_1 = $("#ul_1_"+content_div_name);
+                   var ul_2 = $("#ul_2_"+content_div_name);
+                   var ul_3 = $("#ul_3_"+content_div_name);
+                   callback.push({func:get_type_1_val_cb, args:[ul_3, name]});
+                   init_top_li(content_div_name, name, ul_1, ul_2, ul_3, e.data);
+               %elif i['type'] == 2:
+                   var select_name = "select_" + content_div_name;
+                   add_inner_2(content_div_name, inner_div_name, select_name, name);
+                   callback.push({func:get_type_2_val_cb, args:[select_name, name]});
+                   init_option(select_name, e.data, name);
+
+                   $("#"+select_name).kendoMultiSelect({
+                        autoClose: false
+                    }).data("kendoMultiSelect");
+               %endif
+               count['${i['name']}'] += 1;
+
+            });
+        %endfor
+
+    });
+
+    function get_type_1_val_cb(ul_3, name) {
+        var ret = [];
+        if (ul_3.find("li").length) {
+            ul_3.find("li").each(function () {
+                ret.push($(this).val());
+            });
+            return {is:1, rules:ret};
+        }
+        return {error_msg:name+" couldn't be empty"};
+    }
+
+    function get_type_2_val_cb(select_name, name) {
+        var val = $("#"+select_name).val();
+        if(val) {
+            var ret = val.map(function(v, k) {return parseInt(v);});
+            return {is:1, rules:ret};
+        }
+        return {error_msg:name+" couldn't be empty"};
+    }
+    function init_option(select_name, data, name) {
+       <%
+           options = []
+           conf = {}
+           for first in rule_config.rule_first_category[i['id']]:
+               conf[first['id']] = rule_config.rule_second_category[first['id']]
+               options.extend(rule_config.rule_second_category[first['id']])
+       %>
+       var selected = " "
+       %for option in options:
+            selected = " ";
+            for(var i in data.data) {
+                if (${option['id']} == data.data[i].id) {
+                    selected = " selected"
+                    break;
+                }
+            }
+            if(!sec_cate_conf[name]) {
+                sec_cate_conf[name] = ${conf};
+            }
+           var option = $("<option value=${option['id']} "+selected+">${option['name']}</option>");
+           option.appendTo($("#"+select_name));
+       %endfor
+    }
+
+    function parse_li(list) {
+        return list.map(function(v, k) {
+           var top_cate = "";
+           top_cate=" sec_cate="+v.sec;
+           var li = $("<li value="+v.id+top_cate+" >"+v.name+"</li>");
+           return li;
+       })
+    }
+
+    function init_top_li(name, type_name, ul1, ul2, ul3, data) {
+        add_top_li(name, type_name, ul1, top_cate[name], ul2, ul3, data);
+        bind_search($("#search_1_"+name), add_top_li, name, type_name, ul1, top_cate[name], ul2, ul3);
+    }
+
+    function add_top_li(name, type_name, ul1, li_list, ul2, ul3) {
+        data = arguments[6]? arguments[6]:null;
+        for(var i in li_list) {
+            var li = li_list[i];
+            click_top_li(li_list[i], name, type_name, ul2, ul3, data);
+            li.appendTo(ul1);
+        }
+    }
+
+    function click_top_li(li, name, type_name, ul2, ul3, data) {
+        li.click(function() {
+            var from_top = false;
+            if(!$(this).attr("selected")) {
+                $(this).attr("selected", "selected");
+                $(this).addClass("selected-border-gray");
+                from_top = true;
+            }
+            init_sec_li(name, type_name, parseInt($(this).val()), ul2, ul3, from_top, data)
+        })
+        if(data && data.data.length!=0)
+            init_sec_li(name, type_name, parseInt(li.val()), ul2, ul3, false, data)
+    }
+
+    function add_sec_li(name, type_name, ul, li_list, ul3, from_top, data) {
+        var has_selected = false;
+        for(var i in li_list) {
+            var li = li_list[i];
+            if(li.attr("selected"))
+                has_selected = true;
+            li.appendTo(ul);
+            click_sec_li(li, name, ul3);
+        }
+        var val_list = data?data.data:[];
+
+        if(!has_selected && !val_list.length) {
+            for(var i in li_list) {
+                li_list[i].attr("selected", "selected");
+                li_list[i].addClass("selected-border-gray");
+                add_display_ul(ul3, li_list[i], name);
+            }
+        }
+        else if(val_list.length){
+            for(var i in li_list) {
+                for(var j in val_list) {
+                    if(li_list[i].val() == val_list[j].id) {
+                        
+                        li_list[i].attr("selected", "selected");
+                        li_list[i].addClass("selected-border-gray");
+                        add_display_ul(ul3, li_list[i], name);
+
+
+                        for(var n in top_cate[name]) {
+                            if(top_cate[name][n].val() == parseInt(li_list[i].attr("sec_cate"))) {
+                                top_cate[name][n].attr("selected", "selected");
+                                top_cate[name][n].addClass("selected-border-gray");
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    function active_top_selected(name, val) {
+        var is_empty = true;
+        var l = sec_cate[name][val];
+        for (var i in l) {
+            if(l[i].attr('selected')){
+                is_empty = false;
+                break;
+            }
+         }
+        if(!is_empty) {
+            for(var i in top_cate[name]) {
+                if(top_cate[name][i].val() == val) {
+                    top_cate[name][i].attr("selected", "selected");
+                    top_cate[name][i].addClass("selected-border-gray");
+                }
+            }
+        }
+    }
+
+
+
+    function cancel_top_selected(name, val) {
+        var is_empty = true;
+        var l = sec_cate[name][val];
+        for (var i in l) {
+            if(l[i].attr('selected')){
+                is_empty = false;
+                break;
+            }
+         }
+        if(is_empty) {
+            for(var i in top_cate[name]) {
+                if(top_cate[name][i].val() == val) {
+                    top_cate[name][i].removeAttr("selected");
+                    top_cate[name][i].removeClass("selected-border-gray");
+                }
+            }
+        }
+    }
+
+    function cancel_sec_selected(li, ul3, name) {
+        li.removeAttr("selected");
+        li.removeClass("selected-border-gray");
+        remove_display_ul(ul3, li.val());
+        cancel_top_selected(name, parseInt(li.attr("sec_cate")));
+    }
+
+
+    function click_sec_li(li, name, ul3){
+        li.click(function() {
+            if(!$(this).attr("selected")) {
+                $(this).attr("selected", "selected");
+                $(this).addClass("selected-border-gray");
+                active_top_selected(name, parseInt($(this).attr("sec_cate")));
+                add_display_ul(ul3, $(this), name);
+            } else {
+                cancel_sec_selected($(this), ul3, name);
+            }
+        })
+    }
+
+    function get_sec_cate_conf(type_name, id){
+        $.ajax({
+            async:false,
+            url:"${sec_cate_url}", 
+            type:"GET",
+            data:{id:id},
+            success: function(data) {
+                sec_cate_conf[type_name][id] = JSON.parse(data);
+            }
+        })
+    }
+
+    function init_sec_li(name, type_name, id, ul, ul3, from_top, data) {
+        ul.empty();
+        if (!sec_cate[name][id]) {
+            if (!sec_cate_conf[type_name][id]) {
+                get_sec_cate_conf(type_name, id);
+            }
+            var list = parse_li(sec_cate_conf[type_name][id]);
+            sec_cate[name][id] = list;
+        }
+        add_sec_li(name, type_name, ul, sec_cate[name][id], ul3, from_top, data);
+        bind_search($("#search_2_"+name), add_sec_li, name, type_name, ul, sec_cate[name][id], ul3);
+    }
+    
+    function remove_display_ul(ul3, id) {
+        ul3.find("li[value='"+id+"']").remove();
+    }
+
+    function add_display_ul(ul3, sec_li, name) {
+        var btn = $('<button type="button" class="close">×</button>');
+        var li = $("<li value='"+sec_li.val()+"'>"+sec_li.text()+"</li>");
+        btn.appendTo(li);
+        btn.click(function() {
+            cancel_sec_selected(sec_li, ul3, name);
+        });
+        li.appendTo(ul3);
+    }
+</script>
+

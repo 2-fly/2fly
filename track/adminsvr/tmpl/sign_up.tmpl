@@ -1,0 +1,176 @@
+<script src="/assets/telerik/js/kendo.all.min.js"></script>
+<link rel="stylesheet" href="/assets/telerik/styles/kendo.common.min.css" />
+<link rel="stylesheet" href="/assets/telerik/styles/kendo.bootstrap.min.css" />
+
+
+<div id="example" class="bg">
+    <div class="form">
+        <form method="POST" action="/signup" id="myform" enctype="multipart/form-data">
+            <div style="" class="pannel">
+                <ul class="fieldlist">
+                    <li><img src="/assets/image/massival-logo.png"></img></li>
+                        <li>
+                            <div class="margin-bottom">
+                                <span class="k-textbox k-space-left" style="width: 100%;" >
+                                    <a tabindex=-1 href="#" class="my-icon my-icon-user">&nbsp;</a>
+                                    <input placeholder="Username" type="text" id="icon-left" name="username" value="${username if username else''}"/>
+                                </span>
+                            </div>
+                            <div class="margin-bottom">
+                                <span class="k-textbox k-space-left" style="width: 100%;" >
+                                    <a tabindex=-1 href="#" class="my-icon my-icon-email">&nbsp;</a>
+                                    <input placeholder="E-mail" type="text" id="icon-left" name="email" value="${email if email else ''}"/>
+                                </span>
+                            </div>
+                            <div class="margin-bottom">
+                                <span class="k-textbox k-space-left" style="width: 100%;" >
+                                    <input type="password" placeholder="Password" id="pwd" name="password"/>
+                                    <a tabindex=-1 href="#" class="my-icon my-icon-block">&nbsp;</a>
+                                </span>
+                            </div>
+                            <div class="margin-bottom">
+                                <span class="k-textbox k-space-left" style="width: 100%;" >
+                                    <input type="password" placeholder="Repeat Password" id="confirm"/>
+                                    <a tabindex=-1 href="#" class="my-icon my-icon-block">&nbsp;</a>
+                                </span>
+                            </div>
+                            <div><span class="label ${tip_cls}" id='tips'>${tips}</span></div>
+                        </li>
+                        <li>
+                            <button id="submit" type="submit" class="sign-up-btn">SIGN UP</button>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+
+          $("#myform").submit(function() {
+                if($("#pwd").val() == $("#confirm").val()) {
+                } else {
+                    $("#tips").text("repeat password must be same as password");
+                    return False;
+                }
+           });
+      });
+    </script>
+
+
+    <style>
+                    form {margin:0px}
+                    a{color:#fff;} a:hover{color:#fff;} .fieldlist{margin:0;padding: 0;}
+
+                    a[class*="my-icon-"] {
+                        width:20px;
+                        height:20px;
+                        background-size:20px 20px;
+                        left:6px!important;
+                        cursor:default;
+                    }
+
+                    .my-icon { top:50%;margin:-8px 0 0; position:absolute; vertical-align:middle;}
+
+                .my-icon-block{ background-image:url("/assets/image/login-password-icon.png"); }
+                .my-icon-user{ background-image:url("/assets/image/login-user-icon.png"); }
+                .my-icon-email{ background-image:url("/assets/image/login-mail-icon.png"); }
+
+                span.k-textbox:focus, span.k-textbox:hover {
+                      border-color:#414d5c;
+                      background-color: #283443;;
+                      -webkit-box-shadow: 0 0 7px 0 #76abd9;
+                      box-shadow: 0 0 7px 0 #76abd9;
+                }
+
+                .k-textbox input{
+                    border:none;
+                    height:38px;
+                    padding:4px 0;
+                    background-color:#283443;
+                    border-radius:2px;
+                    color:#fff;
+                    line-height:25px;
+                }
+
+                .k-textbox input:focus{
+                  border:none;
+                  outline: 0;
+                  outline: thin dotted \9;
+                  /* IE6-9 */
+
+                  -webkit-box-shadow: none;
+                     -moz-box-shadow: none;
+                          box-shadow: none;
+                }
+
+                span.k-textbox{
+                    background-color:#283443;
+                    color:#364760;
+                    border-radius:2px;
+                    border-color:#414d5c;
+                    font-size:16px;
+                }
+
+                .margin-bottom{
+                    width:100%;
+                    margin-bottom:20px;
+                }
+                .margin-bottom:last-child{
+                    margin-bottom:0px;
+                }
+
+                .fieldlist li {
+                    position:relative;
+                    text-align:center;
+                    width:300px;
+                    padding-bottom: 40px;
+                    list-style: none;
+                }
+
+                .fieldlist li:last-child{
+                    padding-bottom:0px;
+                }
+
+                .sign-up-btn {
+                    width:100%;
+                    height:48px;
+                    font-size:18px;
+                    line-height:48px;
+                    background-color:#e74e40;
+                    color:#fff;
+                    border:none;
+                      -webkit-border-radius: 2px;
+                         -moz-border-radius: 2px;
+                              border-radius: 2px;
+                }
+                .bg {
+                    position:relative;
+                    height:100%;
+                    vertical-align:middle;
+                    background-color: rgba(45,58,75,0.8);
+                }
+                @media \0screen\,screen\9 {/* 只支持IE6、7、8 */
+                    .bg {
+                        background-color:#2d3a4b;
+                        vertical-align:middle;
+                        height:100%;
+                        ilter:alpha(opacity=70); /*IE滤镜，透明度50%*/
+                        -moz-opacity:0.7; /*Firefox私有，透明度50%*/
+                        opacity:0.7;/*其他，透明度50%*/
+                        position:relative;
+                        *zoom:1;
+                    }
+                }
+
+                .pannel {
+                    width:300px;margin:auto;background-color:#2d3a4b;padding:30px 50px;
+                }
+
+                .form {
+                    margin:-233px 0 0 -200px;
+                    position:absolute;
+                    top:50%!important;
+                    left:50%;
+                }
+            </style>

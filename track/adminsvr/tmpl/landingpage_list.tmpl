@@ -1,0 +1,61 @@
+<style>
+    .bar{ height: 18px; background:black; }
+    .edit-icon { height:15px;width:15px;margin:auto; }
+</style>
+
+<script type="text/javascript">
+    var fields = {};
+    var columns = [{field:"edit_url", title:"   ", width:"29px", template:"<a class='edit-icon' href='#:edit_url#'><img src='/assets/image/edit-icon.png'></img></a>"}];
+    % for i in field_names:
+    fields['${i['name']}'] = {type: "${i['type']}"};
+    var col = {field:'${i['name']}', title:'${i['name']}'};
+    if(fields['${i['name']}'].type == "string")
+       col.width = "130px";
+    columns.push(col);
+    %endfor
+    <%
+        import ujson
+        datas = [dict(rec['values'], edit_url=rec['edit_url']) for rec in records]
+    %>
+    var datas = ${datas};
+    $(document).ready(function () {
+        $("#grid").kendoGrid({
+            dataSource: {
+                data: datas,
+                schema: {model:{fields:fields}},
+                pageSize: 20
+            },
+            sortable: true,
+            pageable: {
+                pageSizes: true,
+                buttonCount: 5
+            },
+            columns: columns});
+    });
+
+</script>
+
+<div class="row-fluid">
+    <ul class="nav nav-tabs actions-nav">
+        <li class="active">
+            <a href="javascript:void(0)">List (${len(records)})</a>
+        </li>
+
+        <li>
+            <a href="${create_url}" title="Create new record">Create</a>
+        </li>
+        <li>
+            <a href="${batch_upload_url}" title="Batch upload files">Batch Upload</a>
+        </li>
+        <li>
+            <a href="${campaign_check_url}" title="Check Campaign">Check</a>
+        </li>
+    </ul>
+</div>
+
+
+<div class="row-fluid">
+    <div id="grid"></div>
+</div>
+
+

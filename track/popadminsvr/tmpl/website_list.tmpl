@@ -1,0 +1,31 @@
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active"><a href="#">List</a></li>
+  <li role="presentation"><a data-pjax href="${add_url}">Create</a></li>
+</ul>
+<h3>Your Website</h3>
+<div>
+    <div id="website-list"></div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $("#website-list").kendoGrid({
+            dataSource:{
+                data:${site_list},
+                pageSize:20,
+            },
+            columns:[
+                {field:"id", width:50,title:" ", sortable:false, filterabe:false, template:"<a data-pjax class='edit-icon' href='${edit_url}?id=#:id#'><img src='/assets/image/edit-icon.png'></img></a>"},
+                {field:"name", width:240},
+                //{field:"uri", width:240},
+            ],
+            sortable:true,
+            pageable: {
+                pageSizes: true,
+                buttonCount: 5
+            },
+        });
+        var pjax = $("a[data-pjax]");
+        initPjaxTag(pjax, "#content-inner");
+    });
+</script>

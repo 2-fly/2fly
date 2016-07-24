@@ -1,0 +1,161 @@
+<div class="row-fluid">
+    <ul class="nav nav-tabs">
+      <li>
+          <a href="${list_url}">List</a>
+      </li>
+      <li class="active">
+          <a href="javascript:void(0)">Create</a>
+      </li>
+    </ul>
+</div>
+
+<div class="row-fluid">
+    <form action="" method="POST" class="form-horizontal" enctype="multipart/form-data">
+      <fieldset>
+
+          <div class="control-group">
+            ${op_tips}
+          </div>
+
+        % for i in xrange(len(fields)):
+        <div class="control-group">
+            <div class="control-label">
+            <!--
+              <label for="name">${fields[i]}<strong style="color: red">*</strong>
+              -->
+              <label for="${fields[i]['name']}">${fields[i]['name']}</strong>
+              </label>
+            </div>
+            <div class="controls">
+              <div>
+              % if fields[i]['is_normal']:
+                % if not fields[i]['is_multi']:
+                    % if fields[i]['is_textarea']:
+                        <textarea cols="40" id="${fields[i]['name']}" name="${fields[i]['name']}" rows="10"></textarea>
+                    % elif fields[i]['is_disable']:
+                        <input id="${fields[i]['name']}" name="${fields[i]['name']}" type="text" value="${fields[i]['disable_value']}" readonly>
+                    % else:
+                        % if fields[i]['name'] == "timezone":
+                        <select id="timezone" name="timezone"></select>
+                        <script>
+                        $(document).ready(function() {
+                            CreateTimeZoneOption("timezone");
+                          })
+                        </script>
+                        %elif fields[i]['name'] == "country":
+                        <select id="country" name="country"></select>
+                        <script>
+                            $(document).ready(function() {
+                                CreateNationOption("country", ${country_config});
+                            })
+                        </script>
+                        %elif fields[i]['name']=="ad_server_domains":
+                            <div id="domains_container"></div>
+                            <input type="hidden" name="ad_server_domains" id="ad_server_domains" value="">
+                            <script>
+                                $(document).ready(function() {
+                                     $("#domains_container").InitAddInputCompent({
+                                        dest:"ad_server_domains",
+                                        btn_txt:"add ad domains",
+                                     });
+                                })
+                            </script>
+                        % else:
+                        <input id="${fields[i]['name']}" name="${fields[i]['name']}" type="text" value="">
+                        %endif
+                    % endif
+                % else:
+                    <select id="${fields[i]['name']}-sel" name="${fields[i]['name']}-sel" multiple="multiple" class="multiselect">
+                        % for k, v in fields[i]['items']:
+                            <option value="${k}">${v}</option>
+                        % endfor
+                    </select>
+                    <input id="${fields[i]['name']}" name="${fields[i]['name']}" type="hidden" value="">
+                % endif
+              % else:
+                    <select id="${fields[i]['name']}" name="${fields[i]['name']}">
+                        <option selected="" value="__None"></option>
+                        % for k, v in fields[i]['items']:
+                            <option value="${k}">${v}</option>
+                        % endfor
+                    </select>
+              % endif
+              </div>
+              ${fields[i]['tips']}
+            </div>
+        </div>
+        % endfor
+ 
+        
+            <div class="control-group">
+              <div class="controls">
+                <input id="mysmt" type="submit" class="k-button btn-save" value="Submit">
+                <a href="${list_url}" class="k-button btn-cancel">Cancel</a>
+
+
+                <script type="text/javascript">
+                $( document ).ready( function() {
+                        //$( 'textarea#page_source' ).ckeditor();
+                    % for i in xrange(len(fields)):
+                        % if fields[i]['is_normal'] and fields[i]['is_multi']:
+                            $('#${fields[i]['name']}-sel').select2();
+                        % endif
+                    % endfor
+                } );
+                </script>
+
+                <script type="text/javascript">
+                    function select2str(obj)
+                    {
+                            var data = obj.select2('data');
+                            var array = [];
+                            $.each(data, function(index, val) {
+                                array[index]=val.id;
+                                });
+                            return array.join(',');
+                    }
+
+                    % for i in xrange(len(fields)):
+                        % if fields[i]['is_normal'] and fields[i]['is_multi']:
+
+                            $("#${fields[i]['name']}-sel").on('change', function(){
+                                    var s = select2str($(this));
+                                    $("#${fields[i]['name']}").val( s );
+                            });
+
+                        % endif
+                    % endfor
+
+
+                    $("#mysmt").click(function(){
+                        return;
+                    })
+                </script>
+
+
+                <!--
+                <select id="owners" name="owners" multiple="multiple">
+                    <option value="AL">Alabama</option>
+                    <option value="WY">Wyoming</option>
+                    <option value="SL">SeasonLee</option>
+                </select>
+
+                <input id="owners-hid" name="owners-hid" type="hidden" value="">
+
+                <script type="text/javascript">
+                $('#owners').select2();
+
+                $("#mysmt").click(function(){
+                    $("#owners-hid").attr("value", $("#owners").val());
+                })
+                </script>
+                -->
+
+                  </div>
+            </div>
+      </fieldset>
+    </form>            
+</div>
+
+
+

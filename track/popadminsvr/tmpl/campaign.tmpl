@@ -1,0 +1,715 @@
+<ul class="nav nav-tabs">
+  <li role="presentation"><a data-pjax href="${list_url}">List</a></li>
+  <li role="presentation" class="active"><a href="#">${nav_title}</a></li>
+</ul>
+<h3>${title}</h3>
+<form id="myform" class="form-horizontal" method="POST" data-pjax action="">
+  ${optips if optips else ""}
+  ${"<input type='hidden' value='%d' name='id'>"%id if type(id) == int else ""}
+  <div class="form-group ${"has-error" if "name" in tips else ""}">
+    <label for="inputEmail3" class="col-sm-2 control-label">Name</label>
+    <div class="col-sm-10">
+      <input type="text" name="name" ${"value='%s'"%name if name else ""} class="form-control form-control-input" placeholder="name">
+      ${"<p class='text-danger'>%s</p>"%tips['name'] if "name" in tips else ""}
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "url" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Url</label>
+    <div class="col-sm-10">
+      <input type="text" name="url" ${"value='%s'"%url if url else ""} class="form-control form-control-input" placeholder="url">
+      ${"<p class='text-danger'>%s</p>"%tips['url'] if "url" in tips else ""}
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "a_domain" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">A Domain</label>
+    <div class="col-sm-10">
+      <input name="a_domain" class="form-control form-control-input" ${"value='%s'"%a_domain if a_domain else ""} placeholder="domain...">
+      ${"<p class='text-danger'>%s</p>"%tips['a_domain'] if "a_domain" in tips else ""}
+    </div>
+  </div>
+
+
+  <div class="form-group ${"has-error" if "country" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Country</label>
+    <div class="col-sm-10">
+      <select id="country" multiple="multiple" class="content-widget" data-placeholder="Select country...">
+            %for n,val, _ in options['country']:
+                <option value="${val}">${n}</option>
+            %endfor
+      </select>
+      <input id="country_input" type='hidden' name="country" disabled>
+      ${"<p class='text-danger'>%s</p>"%tips['country'] if "country" in tips else ""}
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "os" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">OS</label>
+    <div class="col-sm-10">
+      <select id="os" multiple="multiple" class="content-widget" data-placeholder="Select OS...">
+            %for n,val in options['os']:
+                <option value="${val}" }>${n}</option>
+            %endfor
+      </select>
+      <input id="os_input" type='hidden' name="os" disabled>
+      ${"<p class='text-danger'>%s</p>"%tips['os'] if "os" in tips else ""}
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "browser" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Browser</label>
+    <div class="col-sm-10">
+      <select id="browser" multiple="multiple" class="content-widget" data-placeholder="Select browser...">
+            %for n,val in options['browser']:
+                <option value="${val}" }>${n}</option>
+            %endfor
+      </select>
+      <input id="browser_input" type='hidden' name="browser" disabled>
+      ${"<p class='text-danger'>%s</p>"%tips['browser'] if "browser" in tips else ""}
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "category" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Category</label>
+    <div class="col-sm-10">
+      <select id="category" multiple="multiple" class="content-widget" data-placeholder="Select category...">
+            %for n,val in options['category']:
+                <option value="${n}" }>${val}</option>
+            %endfor
+      </select>
+      <input id="category_input" type='hidden' name="category" disabled>
+      ${"<p class='text-danger'>%s</p>"%tips['category'] if "category" in tips else ""}
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "include_websites" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Include Websites</label>
+    <div class="col-sm-10">
+      <textarea id="include" name="include_websites" class="form-control form-control-input" rows=5 placeholder="include websites">${include_websites.replace(",", "\n") if include_websites else ""}</textarea>
+      ${"<p class='text-danger'>%s</p>"%tips['include_websites'] if "include_websites" in tips else ""}
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "exclude_websites" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Exclude Websites</label>
+    <div class="col-sm-10">
+      <textarea id="exclude" name="exclude_websites" class="form-control form-control-input" rows=5 placeholder="exclude websites">${exclude_websites.replace(",", "\n") if exclude_websites else ""}</textarea>
+      ${"<p class='text-danger'>%s</p>"%tips['exclude_websites'] if "exclude_websites" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "exchange" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Exchange</label>
+    <div class="col-sm-10">
+      <select id="exchange" name="exchange">
+        <option value="0">Not Select</option>
+        <option value="1">Smaato</option>
+        <option value="2">Mobfox</option>
+        <option value="3">SmartyAds</option>
+        <option value="4">Altitude</option>
+        <option value="5">VMax</option>
+        <option value="6">Axonix</option>
+        <option value="7">Epom</option>
+        <option value="8">Falk</option>
+        <option value="9">Ants</option>
+        <option value="10">VMax(New)</option>
+        <option value="11">SmartyAds(New)</option>
+      </select>
+      ${"<p class='text-danger'>%s</p>"%tips['exchange'] if "exchange" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "status" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Status</label>
+    <div class="col-sm-10">
+      <label class="radio-inline">
+          <input type="radio" name="status" value="0" ${'checked' if not status or status==0 else ''}> off
+        </label>
+        <label class="radio-inline">
+          <input type="radio" name="status" value="1" ${'checked' if status and status==1 else ''}> on
+      </label>
+      ${"<p class='text-danger'>%s</p>"%tips['status'] if "status" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "device_type" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Device Type</label>
+    <div class="col-sm-10">
+      <label class="radio-inline">
+          <input type="radio" name="device_type" value="0" ${'checked' if not device_type or device_type==0 else ''}>All
+      </label>
+      <label class="radio-inline">
+          <input type="radio" name="device_type" value="1" ${'checked' if device_type and device_type==1 else ''}>Phone
+      </label>
+      <label class="radio-inline">
+          <input type="radio" name="device_type" value="2" ${'checked' if device_type and device_type==2 else ''}>Tablet
+      </label>
+      ${"<p class='text-danger'>%s</p>"%tips['device_type'] if "device_type" in tips else ""}
+    </div>
+  </div>
+
+ <div class="form-group ${"has-error" if "device_type" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Connection Type</label>
+    <div class="col-sm-10">
+      <label class="radio-inline">
+          <input type="radio" name="connection_type" value="0" ${'checked' if not connection_type or connection_type==0 else ''}>All
+      </label>
+      <label class="radio-inline">
+          <input type="radio" name="connection_type" value="1" ${'checked' if connection_type and connection_type==1 else ''}>2G/3G/4G
+      </label>
+      <label class="radio-inline">
+          <input type="radio" name="connection_type" value="2" ${'checked' if connection_type and connection_type==2 else ''}>WIFI
+      </label>
+      ${"<p class='text-danger'>%s</p>"%tips['connection_type'] if "connection_type" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "source_type" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Source Type</label>
+    <div class="col-sm-10">
+      <label class="radio-inline">
+          <input type="radio" name="source_type" value="0" ${'checked' if not source_type or source_type==0 else ''}>All
+      </label>
+      <label class="radio-inline">
+          <input type="radio" name="source_type" value="1" ${'checked' if source_type and source_type==1 else ''}>App
+      </label>
+      <label class="radio-inline">
+          <input type="radio" name="source_type" value="2" ${'checked' if source_type and source_type==2 else ''}>Wap
+      </label>
+      ${"<p class='text-danger'>%s</p>"%tips['source_type'] if "source_type" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "max_bid" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Max Bid</label>
+    <div class="col-sm-10">
+      <input name="max_bid" id="max_bid" value="${max_bid if max_bid else 0}" class="form-control form-control-input" style="max-width:300px;width:100%"/>
+      ${"<p class='text-danger'>%s</p>"%tips['max_bid'] if "max_bid" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "total_budget" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Total Budget</label>
+    <div class="col-sm-10">
+      <input name="total_budget" id="total_budget" value="${total_budget if total_budget else 0}" class="form-control form-control-input"/>
+      ${"<p class='text-danger'>%s</p>"%tips['total_budget'] if "total_budget" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "daily_budget" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Daily Budget</label>
+    <div class="col-sm-10">
+      <input name="daily_budget" id="daily_budget" value="${daily_budget if daily_budget else 0}" style="max-width:300px;width:100%"/>
+      ${"<p class='text-danger'>%s</p>"%tips['daily_budget'] if "daily_budget" in tips else ""}
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "daily_website_budget" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Daily Website Budget</label>
+    <div class="col-sm-10">
+      <input name="daily_website_budget" id="daily_ws_budget" value="${daily_website_budget if daily_website_budget else 0}" style="max-width:300px;width:100%"/>
+      ${"<p class='text-danger'>%s</p>"%tips['daily_website_budget'] if "daily_website_budget" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "cap_per_ip_ua" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Cap Per IP UA</label>
+    <div class="col-sm-10">
+      <input name="cap_per_ip_ua" id="daily_ws_budget" value="${cap_per_ip_ua if cap_per_ip_ua else 0}" class="form-control form-control-input" style="max-width:300px;width:100%"/>
+      ${"<p class='text-danger'>%s</p>"%tips['cap_per_ip_ua'] if "cap_per_ip_ua" in tips else ""}
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "duration_per_ip_ua" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Duration Per IP UA</label>
+    <div class="col-sm-10">
+      <input name="duration_per_ip_ua" id="duration_ws_budget" value="${duration_per_ip_ua if duration_per_ip_ua else 0}" class="form-control form-control-input" style="max-width:300px;width:100%"/>
+      ${"<p class='text-danger'>%s</p>"%tips['duration_per_ip_ua'] if "duration_per_ip_ua" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "cap_per_did" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Cap Per Did</label>
+    <div class="col-sm-10">
+      <input name="cap_per_did" id="cap_per_did" value="${cap_per_did if cap_per_did else 0}" class="form-control form-control-input" style="max-width:300px;width:100%"/>
+      ${"<p class='text-danger'>%s</p>"%tips['cap_per_did'] if "cap_per_did" in tips else ""}
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "duration_per_did" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Duration Per Did</label>
+    <div class="col-sm-10">
+      <input name="duration_per_did" id="duration_per_did" value="${duration_per_did if duration_per_did else 0}" class="form-control form-control-input" style="max-width:300px;width:100%"/>
+      ${"<p class='text-danger'>%s</p>"%tips['duration_per_did'] if "duration_per_did" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "image_width_heights" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Image Size</label>
+    <div class="col-sm-10">
+      <select id="image-size" class="content-widget form-kendo-ctrl" data-placeholder="Select image size...">
+        %for option in options['image_size']:
+            <option>${option}</option>
+        %endfor
+      </select>
+      ${"<p class='text-danger'>%s</p>"%tips['image_width_heights'] if "image_width_heights" in tips else ""}
+      <input name="image_width_heights" type="hidden" disabled/>
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "image_urls" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Image Url</label>
+    <div class="col-sm-10">
+        <div class="row">
+            <textarea name="image_urls" class="form-control form-control-input" rows=5 placeholder="urls..">${image_urls.replace(",", "\n") if image_urls else ""}</textarea>
+        </div>
+      ${"<p class='text-danger'>%s</p>"%tips['image_urls'] if "image_urls" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "sample_image_url" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Sample Image Url</label>
+    <div class="col-sm-10">
+      <input name="sample_image_url" class="form-control form-control-input" placeholder="sample image url..." value="${sample_image_url if sample_image_url else ""}"/>
+      ${"<p class='text-danger'>%s</p>"%tips['sample_image_url'] if "sample_image_url" in tips else ""}
+    </div>
+  </div>
+
+
+
+  <div class="form-group ${"has-error" if "start_ts" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Start Date</label>
+    <div class="col-sm-10">
+      <input id="start_ts" class="form-control form-control-input"/>
+      ${"<p class='text-danger'>%s</p>"%tips['start_ts'] if "start_ts" in tips else ""}
+    </div>
+    <input name="start_ts" type="hidden"/>
+  </div>
+  <div class="form-group ${"has-error" if "end_ts" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">End Date</label>
+    <div class="col-sm-10">
+      <input id="end_ts" class="form-control form-control-input"/>
+      ${"<p class='text-danger'>%s</p>"%tips['end_ts'] if "end_ts" in tips else ""}
+    </div>
+    <input name="end_ts" type="hidden"/>
+  </div>
+
+  <div class="form-group ${"has-error" if "timezone" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Timezone</label>
+    <div class="col-sm-10">
+      <select id="timezone" class="content-widget form-kendo-ctrl"></select>
+      ${"<p class='text-danger'>%s</p>"%tips['timezone'] if "timezone" in tips else ""}
+    </div>
+    <input name="timezone" type="hidden"/>
+  </div>
+
+  <div class="form-group ${"has-error" if "isp" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Isp</label>
+    <div class="col-sm-10">
+      <textarea name="isp" class="form-control form-control-input" rows=5 placeholder="isp...">${isp.replace(",", "\n") if isp else ""}</textarea>
+      ${"<p class='text-danger'>%s</p>"%tips['isp'] if "isp" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "ip_range" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Ip Range</label>
+    <div class="col-sm-10">
+      <textarea name="ip_range" class="form-control form-control-input" rows=5 placeholder="0.0.0.0-0.0.0.255">${ip_range.replace(",", "\n") if ip_range else ""}</textarea>
+      ${"<p class='text-danger'>%s</p>"%tips['ip_range'] if "ip_range" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "beacon_urls" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">Beacon Urls</label>
+    <div class="col-sm-10">
+      <textarea name="beacon_urls" class="form-control form-control-input" rows=5 placeholder="urls..">${beacon_urls.replace(",", "\n") if beacon_urls else ""}</textarea>
+      ${"<p class='text-danger'>%s</p>"%tips['beacon_urls'] if "beacon_urls" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "jc_js_url" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">JC JS Url</label>
+    <div class="col-sm-10">
+      <input name="jc_js_url" id="jc_js_path" value="${jc_js_url if jc_js_url else ""}" class="pull-left form-control form-control-input" style="max-width:300px;width:100%"/>
+      <button type="button" id="upload_ac" class="btn btn-default pull-left" style="margin-left:10px">Upload</button>
+      <button type="button" id="check_ac" class="btn btn-default pull-left" style="margin-left:10px">Check</button>
+      ${"<p class='text-danger'>%s</p>"%tips['jc_js_url'] if "jc_js_url" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "jc_js_camp_url" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">JC JS Camp Url</label>
+    <div class="col-sm-10">
+      <input name="jc_js_camp_url" id="jc_js_camp_url" value="${jc_js_camp_url if jc_js_camp_url else ""}" class="form-control form-control-input" style="max-width:300px;width:100%"/>
+      ${"<p class='text-danger'>%s</p>"%tips['jc_js_camp_url'] if "jc_js_camp_url" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group ${"has-error" if "adm" in tips else ""}">
+    <label for="inputPassword3" class="col-sm-2 control-label">adm</label>
+    <div class="col-sm-10">
+        <input type="hidden" id="adm" name="adm" value="">
+        <article>
+        %if adm:
+            <textarea id="edit_adm" rows="10" cols="20">${adm}</textarea>
+        %else:
+            <textarea id="edit_adm" rows="10" cols="20"></textarea>
+        %endif
+        </article>
+      ${"<p class='text-danger'>%s</p>"%tips['adm'] if "adm" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="button" id="mysmt" class="btn btn-default">Submit</button>
+      %if clone_url:
+          <button type="button" id="clone" class="btn btn-default" style="margin-left:10px">Clone</button>
+      %endif
+    </div>
+  </div>
+</form>
+
+<script src="/assets/admin/js/timezone.js?version=${version}"></script>
+
+<script>
+    $(document).ready(function() {
+        window.editor = CodeMirror.fromTextArea(document.getElementById("edit_adm"), {
+                mode: 'text/html',
+                lineNumbers : true,
+                lineWrapping : true,
+                //autofocus : true,
+              });
+
+        var size_select = $("#image-size").kendoDropDownList({
+            filter: "contains",
+            autoClose:false,
+        }).data("kendoDropDownList");
+        function buildFilters(size) {
+            var filter = {
+                field: "size",
+                operator: "eq",
+                value: size
+            };
+            return filter;
+        };
+        %if image_width_heights:
+            size_select.value("${image_width_heights}");
+        %endif
+
+        var exchange = $("#exchange").kendoDropDownList().data("kendoDropDownList");
+        exchange.value("${exchange or 0}");
+
+
+        $("#files").kendoUpload({})
+        var country_select = $("#country").kendoMultiSelect({
+            filter: "contains",
+            autoClose:false,
+            change:function () {
+                if(this.value().indexOf("ALL") != -1)
+                   this.value("ALL");
+            }
+        }).data("kendoMultiSelect");
+
+        var os_select = $("#os").kendoMultiSelect({
+            filter: "contains",
+            autoClose:false,
+            change:function () {
+                if(this.value().indexOf("ALL") != -1)
+                   this.value("ALL");
+            }
+        }).data("kendoMultiSelect");
+
+
+        var browser_select = $("#browser").kendoMultiSelect({
+            filter: "contains",
+            autoClose:false,
+            change:function () {
+                if(this.value().indexOf("ALL") != -1)
+                   this.value("ALL");
+            }
+        }).data("kendoMultiSelect");
+
+        var category_select = $("#category").kendoMultiSelect({
+            filter: "contains",
+            autoClose:false,
+            change:function () {
+                if(this.value().indexOf("ALL") != -1)
+                   this.value("ALL");
+            }
+        }).data("kendoMultiSelect");
+
+        $("#daily_budget").kendoNumericTextBox({
+            min: 0,
+            step: 0.01,
+        });
+
+        $("#daily_ws_budget").kendoNumericTextBox({
+            min: 0,
+            step: 0.01,
+        });
+
+        CreateTimeZoneOption("timezone", ${timezone if type(timezone) == int else 8});
+
+        function startChange() {
+            var startDate = start.value(),
+            endDate = end.value();
+
+            if (startDate) {
+                startDate = new Date(startDate);
+                startDate.setDate(startDate.getDate());
+                end.min(startDate);
+            } else if (endDate) {
+                start.max(new Date(endDate));
+            } else {
+                endDate = new Date();
+                start.max(endDate);
+                end.min(endDate);
+            }
+        }
+
+        function endChange() {
+            var endDate = end.value(),
+            startDate = start.value();
+
+            if (endDate) {
+                endDate = new Date(endDate);
+                endDate.setDate(endDate.getDate());
+                start.max(endDate);
+            } else if (startDate) {
+                end.min(new Date(startDate));
+            } else {
+                endDate = new Date();
+                start.max(endDate);
+                end.min(endDate);
+            }
+        }
+        %if start_ts:
+        var start_date = new Date(svr_to_cli_ts(${start_ts}, ${timezone})*1000);
+        %else:
+        var start_date = new Date();
+        start_date.setSeconds(0);
+        start_date.setMinutes(0);
+        start_date.setMilliseconds(0);
+        %endif
+
+        %if end_ts:
+        var end_date = new Date(svr_to_cli_ts(${end_ts}, ${timezone})*1000);
+        %else:
+        var end_date = new Date();
+        end_date.setFullYear(start_date.getFullYear() + 1);
+        end_date.setMonth(start_date.getMonth());
+        end_date.setDate(start_date.getDate());
+        end_date.setHours(start_date.getHours());
+        end_date.setSeconds(0);
+        end_date.setMinutes(0);
+        end_date.setMilliseconds(0);
+        %endif
+
+        var start = $("#start_ts").kendoDateTimePicker({
+            change:startChange,
+            parseFormats: ["MM/dd/yyyy"],
+            value:start_date,
+        }).data("kendoDateTimePicker");
+        var end = $("#end_ts").kendoDateTimePicker({
+            change:endChange,
+            parseFormats: ["MM/dd/yyyy"],
+            value:end_date,
+        }).data("kendoDateTimePicker");
+
+        start.max(end.value());
+        end.min(start.value());
+
+        %if country:
+            country_select.value("${country}".split(","));
+        %endif
+        %if os:
+            os_select.value("${os}".split(","))
+        %endif
+        %if browser:
+            browser_select.value("${browser}".split(","))
+        %endif
+        %if category:
+            category_select.value("${category}".split(","))
+        %endif
+
+        %if clone_url:
+        $("#clone").click(function() {
+            var country_val = country_select.value(),
+                os_val = os_select.value(),
+                size_val = size_select.value(),
+                browser_val = browser_select.value(),
+                category_val = category_select.value();
+
+            if(country_val.length > 0){
+                $("input[name=country]").removeAttr("disabled");
+                $("input[name=country]").val(country_val.join(","));
+            }
+            if(os_val.length > 0){
+                $("input[name=os]").removeAttr("disabled");
+                $("input[name=os]").val(os_val.join(","));
+            }
+            if(browser_val.length > 0){
+                $("input[name=browser]").removeAttr("disabled");
+                $("input[name=browser]").val(browser_val.join(","));
+            }
+
+            if(size_val.length > 0){
+                $("input[name=image_width_heights]").removeAttr("disabled");
+                $("input[name=image_width_heights]").val(size_val);
+            }
+
+            if(category.length > 0){
+                $("input[name=category]").removeAttr("disabled");
+                $("input[name=category]").val(category_val.join(","));
+            }
+
+            var text;
+            text = handle_textarea($("#exclude").val());
+            $("#exclude").val(text);
+
+            text = handle_textarea($("[name=ip_range]").val());
+            $("[name=ip_range]").val(text);
+
+            text = handle_textarea($("[name=beacon_urls]").val());
+            $("[name=beacon_urls]").val(text);
+
+            text = handle_textarea($("[name=image_urls]").val());
+            $("[name=image_urls]").val(text);
+
+            text = handle_textarea($("#include").val());
+            $("#include").val(text);
+
+            var timezone = parseInt($("#timezone").data("kendoDropDownList").value());
+            $("input[name=timezone]").val(timezone);
+
+            var date = Date.parse(start.value())/1000;
+            $("[name=start_ts]").val(cli_to_svr_ts(date, timezone));
+
+            date = Date.parse(end.value())/1000;
+            $("[name=end_ts]").val(cli_to_svr_ts(date, timezone));
+
+            var d = window.editor.getDoc().getValue();
+            document.getElementById("adm").value = d;
+            $("#myform").attr("action", "${clone_url}?clone=1").submit();
+        });
+        %endif
+
+        $("#mysmt").click(function() {
+            var country_val = country_select.value(),
+                os_val = os_select.value(),
+                size_val = size_select.value(),
+                browser_val = browser_select.value();
+                category_val = category_select.value();
+
+            if(country_val.length > 0){
+                $("input[name=country]").removeAttr("disabled");
+                $("input[name=country]").val(country_val.join(","));
+            }
+            if(os_val.length > 0){
+                $("input[name=os]").removeAttr("disabled");
+                $("input[name=os]").val(os_val.join(","));
+            }
+            if(browser_val.length > 0){
+                $("input[name=browser]").removeAttr("disabled");
+                $("input[name=browser]").val(browser_val.join(","));
+            }
+
+            if(size_val.length > 0){
+                $("input[name=image_width_heights]").removeAttr("disabled");
+                $("input[name=image_width_heights]").val(size_val);
+            }
+
+            if(category_val.length > 0){
+                $("input[name=category]").removeAttr("disabled");
+                $("input[name=category]").val(category_val.join(","));
+            }
+
+            var text;
+            text = handle_textarea($("#exclude").val());
+            $("#exclude").val(text);
+
+            text = handle_textarea($("[name=ip_range]").val());
+            $("[name=ip_range]").val(text);
+
+            text = handle_textarea($("[name=beacon_urls]").val());
+            $("[name=beacon_urls]").val(text);
+
+            text = handle_textarea($("[name=image_urls]").val());
+            $("[name=image_urls]").val(text);
+
+            text = handle_textarea($("#include").val());
+            $("#include").val(text);
+
+            var timezone = parseInt($("#timezone").data("kendoDropDownList").value());
+            $("input[name=timezone]").val(timezone);
+
+            var date = Date.parse(start.value())/1000;
+            $("[name=start_ts]").val(cli_to_svr_ts(date, timezone));
+
+            date = Date.parse(end.value())/1000;
+            $("[name=end_ts]").val(cli_to_svr_ts(date, timezone));
+
+            var d = window.editor.getDoc().getValue();
+            document.getElementById("adm").value = d;
+
+            $("#myform").attr("action", "${cur_url}").submit();
+        });
+
+        $("#check_ac").click(function() {
+            var url = document.getElementById("jc_js_path").value;
+            window.open(url);
+        });
+
+        $("#upload_ac").click(function() {
+            var js_camp_url = document.getElementById("jc_js_camp_url").value;
+            var image_urls = handle_textarea($("[name=image_urls]").val());
+            var exchange_type = document.getElementById("exchange").value;
+            var domain= $("[name=a_domain]").val();
+            
+            var d = {
+                "js_camp_url" : js_camp_url,
+                "image_urls" : image_urls,
+                "exchange_type" : exchange_type,
+                "domain" : domain,
+            }
+            $.ajax({
+               type:"GET",
+               url:"${upload_js_ac_url}",
+               data : d,
+               success: function(data) {
+                   var f = JSON.parse(data);
+                   if (f.err){
+                   }else{
+                       document.getElementById("jc_js_path").value = f.jc_js_url
+                   }
+               }
+            });
+        });
+
+        initPjaxTag($("a[data-pjax]"), "#content-inner");
+        initPjaxForm($("form[data-pjax]"), "#content-inner");
+    })
+
+    function handle_textarea(text) {
+        text = text.replace(/\r\n/g, ",");
+        text = text.replace(/\r/g, ",");
+        text = text.replace(/\n/g, ",");
+        return text
+    }
+
+    function cli_to_svr_ts(ts, timezone) {
+        var d = new Date();
+        var localOffset = -d.getTimezoneOffset()*60;
+        localOffset = localOffset - timezone*3600;
+        ts = ts + localOffset;
+        return ts;
+    }
+    function svr_to_cli_ts(ts, timezone) {
+        var d = new Date();
+        var localOffset = -d.getTimezoneOffset()*60;
+        localOffset = localOffset - timezone*3600;
+        ts = ts - localOffset;
+        return ts
+    }
+</script>
+
+<style>
+    .CodeMirror {
+        display: block;
+        float: left;
+        width: 70%;
+        border: 1px solid black;
+    }
+</style>

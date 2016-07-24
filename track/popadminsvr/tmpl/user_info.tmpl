@@ -1,0 +1,64 @@
+<form id="myform" class="form-horizontal" method="POST" data-pjax action="">
+  ${optips if optips else ""}
+  <div class="form-group ${"has-error" if "origin_password" in tips else ""}">
+    <label for="inputEmail3" class="col-sm-2 control-label">Origin Password</label>
+    <div class="col-sm-10">
+      <input type="password" name="origin_password" class="form-control form-control-input" placeholder="origin password">
+      <p id="pwd-tip" class='text-danger'>${tips['origin_password'] if "origin_password" in tips else ""}</p>
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "password" in tips else ""}">
+    <label for="inputEmail3" class="col-sm-2 control-label">New Password</label>
+    <div class="col-sm-10">
+      <input type="password" name="password" class="form-control form-control-input" placeholder="new password">
+      <p id="pwd-tip" class='text-danger'>${tips['password'] if "password" in tips else ""}</p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="inputEmail3" class="col-sm-2 control-label">Confirm</label>
+    <div class="col-sm-10">
+      <input type="password" name="confirm" class="form-control form-control-input" placeholder="confirm password">
+      <p id = "cfm-tip" class='text-danger'></p>
+    </div>
+  </div>
+  <div class="form-group ${"has-error" if "email" in tips else ""}">
+    <label for="inputEmail3" class="col-sm-2 control-label">Email</label>
+    <div class="col-sm-10">
+      <input type="text" name="email" ${"value='%s'"%email if email else ""} class="form-control form-control-input" placeholder="email">
+      ${"<p class='text-danger'>%s</p>"%tips['email'] if "email" in tips else ""}
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="button" id="mysmt" class="btn btn-default">Submit</button>
+    </div>
+  </div>
+</form>
+
+<script>
+    $(document).ready(function() {
+        $("#mysmt").click(function() {
+            $("#pwd-tip").text("");
+            $("#cfm-tip").text("");
+            $("#pwd-tip").parent().parent().removeClass("has-error");
+            $("#cfm-tip").parent().parent().removeClass("has-error");
+
+            var pwd1 = $("input[name=password]").val(),
+                pwd2 = $("input[name=confirm]").val();
+            if(pwd1 && pwd1 == pwd2){
+                if(pwd1.length >= 6) {
+                    $("#myform").submit();
+                } else {
+                    $("#pwd-tip").parent().parent().addClass("has-error");
+                    $("#pwd-tip").text("length of password must greater than 6");
+                }
+            } else {
+                $("#pwd-tip").parent().parent().addClass("has-error");
+                $("#cfm-tip").parent().parent().addClass("has-error");
+                $("#pwd-tip").text("input password must be same");
+                $("#cfm-tip").text("input password must be same");
+            }
+        })
+    })
+</script>

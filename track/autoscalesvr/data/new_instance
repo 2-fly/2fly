@@ -1,0 +1,97 @@
+{
+      "Type" : "Notification",
+        "MessageId" : "583d89ca-d6f0-5645-b573-c473990f0613",
+          "TopicArn" : "arn:aws:sns:us-east-1:105782521297:scale_test",
+            "Subject" : "Auto Scaling: launch for group \"test\"",
+              "Message" : "{\"StatusCode\":\"InProgress\",\"Service\":\"AWS Auto Scaling\",\"AutoScalingGroupName\":\"test\",\"Description\":\"Launching a new EC2 instance: i-43a0ddbe\",\"ActivityId\":\"0b288af5-ca43-48ce-9683-6c7dad482f4e\",\"Event\":\"autoscaling:EC2_INSTANCE_LAUNCH\",\"Details\":{\"Availability Zone\":\"us-east-1a\",\"Subnet
+              ID\":\"subnet-6b7e141c\"},\"AutoScalingGroupARN\":\"arn:aws:autoscaling:us-east-1:105782521297:autoScalingGroup:fa18cd5a-747b-4ab3-8db6-0498e81b7469:autoScalingGroupName/test\",\"Progress\":50,\"Time\":\"2015-04-28T09:07:11.640Z\",\"AccountId\":\"105782521297\",\"RequestId\":\"0b288af5-ca43-48ce-9683-6c7dad482f4e\",\"StatusMessage\":\"\",\"EndTime\":\"2015-04-28T09:07:11.640Z\",\"EC2InstanceId\":\"i-43a0ddbe\",\"StartTime\":\"2015-04-28T09:06:37.698Z\",\"Cause\":\"At
+              2015-04-28T09:06:30Z a user request created an AutoScalingGroup changing the desired capacity from 0 to 1.  At 2015-04-28T09:06:36Z an instance was started in response to a difference between desired and actual capacity, increasing the capacity from 0 to 1.\"}",
+                "Timestamp" : "2015-04-28T09:07:11.671Z",
+                  "SignatureVersion" : "1",
+                    "Signature" : "b/JZwpwrGk6e5ZXD4Yw0pXCUWqwBA/tJA9Mb7/vNOjBYNB/ib4vpLVpLgldjQK98o9kViwDvbubaSR23wyl8tOd/FA2YXYCmFa+TTLFL+7pYhCeUwyHmBJLWbZ5FfzyYwr0dPb0P7aIB/7Y6rUmEP9LT7LS1oB18W1Nm6rlEsswVTT8HPQmUxmux+qZR1yY34r2uIFDNTTl0oXl4Rc+F0w6Bu+5iS0VrM1V76DqCLstJSN8Px9iGNw4mMyW/E4br1nu9TRcMYQTdRSINxwmwaHLDmmrNEaqx7SuaAOVZAmaHUfkPiJpAMuF/LWjJCuRFBin5Xkn4umrNrLqL7RX4yw==",
+                      "SigningCertURL" : "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-d6d679a1d18e95c2f9ffcf11f4f9e198.pem",
+                        "UnsubscribeURL" : "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:105782521297:scale_test:893805c2-cafe-4340-ab24-f1c7525cab27"
+}
+{
+      "Type" : "Notification",
+        "MessageId" : "583d89ca-d6f0-5645-b573-c473990f0613",
+          "TopicArn" : "arn:aws:sns:us-east-1:105782521297:scale_test",
+            "Subject" : "Auto Scaling: launch for group \"test\"",
+              "Message" : "{\"StatusCode\":\"InProgress\",\"Service\":\"AWS Auto Scaling\",\"AutoScalingGroupName\":\"test\",\"Description\":\"Launching a new EC2 instance: i-43a0ddbe\",\"ActivityId\":\"0b288af5-ca43-48ce-9683-6c7dad482f4e\",\"Event\":\"autoscaling:EC2_INSTANCE_LAUNCH\",\"Details\":{\"Availability Zone\":\"us-east-1a\",\"Subnet
+              ID\":\"subnet-6b7e141c\"},\"AutoScalingGroupARN\":\"arn:aws:autoscaling:us-east-1:105782521297:autoScalingGroup:fa18cd5a-747b-4ab3-8db6-0498e81b7469:autoScalingGroupName/test\",\"Progress\":50,\"Time\":\"2015-04-28T09:07:11.640Z\",\"AccountId\":\"105782521297\",\"RequestId\":\"0b288af5-ca43-48ce-9683-6c7dad482f4e\",\"StatusMessage\":\"\",\"EndTime\":\"2015-04-28T09:07:11.640Z\",\"EC2InstanceId\":\"i-43a0ddbe\",\"StartTime\":\"2015-04-28T09:06:37.698Z\",\"Cause\":\"At
+              2015-04-28T09:06:30Z a user request created an AutoScalingGroup changing the desired capacity from 0 to 1.  At 2015-04-28T09:06:36Z an instance was started in response to a difference between desired and actual capacity, increasing the capacity from 0 to 1.\"}",
+                "Timestamp" : "2015-04-28T09:07:11.671Z",
+                  "SignatureVersion" : "1",
+                    "Signature" : "b/JZwpwrGk6e5ZXD4Yw0pXCUWqwBA/tJA9Mb7/vNOjBYNB/ib4vpLVpLgldjQK98o9kViwDvbubaSR23wyl8tOd/FA2YXYCmFa+TTLFL+7pYhCeUwyHmBJLWbZ5FfzyYwr0dPb0P7aIB/7Y6rUmEP9LT7LS1oB18W1Nm6rlEsswVTT8HPQmUxmux+qZR1yY34r2uIFDNTTl0oXl4Rc+F0w6Bu+5iS0VrM1V76DqCLstJSN8Px9iGNw4mMyW/E4br1nu9TRcMYQTdRSINxwmwaHLDmmrNEaqx7SuaAOVZAmaHUfkPiJpAMuF/LWjJCuRFBin5Xkn4umrNrLqL7RX4yw==",
+                      "SigningCertURL" : "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-d6d679a1d18e95c2f9ffcf11f4f9e198.pem",
+                        "UnsubscribeURL" : "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:105782521297:scale_test:893805c2-cafe-4340-ab24-f1c7525cab27"
+}
+
+
+
+
+
+{
+      "Type" : "Notification",
+        "MessageId" : "c2f3d2d7-150a-5be1-ac3f-9f6e40c12218",
+          "TopicArn" : "arn:aws:sns:us-east-1:105782521297:scale_test",
+            "Subject" : "Auto Scaling: launch for group \"testset\"",
+              "Message" : "{\"StatusCode\":\"InProgress\",\"Service\":\"AWS Auto Scaling\",\"AutoScalingGroupName\":\"testset\",\"Description\":\"Launching a new EC2 instance: i-3a8ff2c7\",\"ActivityId\":\"d7a97639-8630-4f25-9507-789852903500\",\"Event\":\"autoscaling:EC2_INSTANCE_LAUNCH\",\"Details\":{\"InvokingAlarms\":[{\"Region\":\"US - N.
+              Virginia\",\"AWSAccountId\":\"105782521297\",\"OldStateValue\":\"ALARM\",\"AlarmName\":\"awsec2-test-CPU-Utilization-no-noti\",\"AlarmDescription\":null,\"NewStateReason\":\"Threshold Crossed: 1 datapoint (99.50800000000001) was greater than or equal to the threshold
+              (60.0).\",\"StateChangeTime\":1430212810702,\"NewStateValue\":\"ALARM\",\"Trigger\":{\"Period\":300,\"Statistic\":\"AVERAGE\",\"MetricName\":\"CPUUtilization\",\"Threshold\":60,\"EvaluationPeriods\":1,\"Dimensions\":[{\"name\":\"AutoScalingGroupName\",\"value\":\"test\"}],\"Namespace\":\"AWS/EC2\",\"ComparisonOperator\":\"GreaterThanOrEqualToThreshold\",\"Unit\":null}}],\"Availability Zone\":\"us-east-1a\",\"Subnet
+              ID\":\"subnet-6b7e141c\"},\"AutoScalingGroupARN\":\"arn:aws:autoscaling:us-east-1:105782521297:autoScalingGroup:0273d5e9-cd82-49fd-8694-e2550fa26980:autoScalingGroupName/testset\",\"Progress\":50,\"Time\":\"2015-04-28T09:31:55.331Z\",\"AccountId\":\"105782521297\",\"RequestId\":\"d7a97639-8630-4f25-9507-789852903500\",\"StatusMessage\":\"\",\"EndTime\":\"2015-04-28T09:31:55.331Z\",\"EC2InstanceId\":\"i-3a8ff2c7\",\"StartTime\":\"2015-04-28T09:31:22.312Z\",\"Cause\":\"At
+              2015-04-28T09:31:07Z a monitor alarm awsec2-test-CPU-Utilization-no-noti in state ALARM triggered policy Increase Group Size changing the desired capacity from 1 to 2.  At 2015-04-28T09:31:16Z an instance was started in response to a difference between desired and actual capacity, increasing the capacity from 1 to 2.\"}",
+                "Timestamp" : "2015-04-28T09:31:55.380Z",
+                  "SignatureVersion" : "1",
+                    "Signature" : "A6Kk/jNz1flCam69iIxWqBMGr2bCPuop87GTd8rCMOyitDSYAnGspwV8drJJ5u1bmU/q42d7MoRXHQN1e8SNCKjlZFpZ473C838iwOkICZxYrZHvPS061fJ0t4Lfz9H/tdGeu91gEtbgLL/L7bMPrzh1CO7r9C7m97j6cX2KjndSUrwrEsqJYzmqfQUSOAnpLAipsthUTSJ1UOl8WL0V7rT/TF3y0UlKa0GF1Ciz1172FnFOoN5Zoy4Zsk9eusl3JyHEOfe4G46kaxE6j/ns95J1F4ObwyFpq8QAVNCjJvOZlz4ruEVkvQsEOk6UP3YXRE51/NhyQWIgvaEwbEMEuw==",
+                      "SigningCertURL" : "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-d6d679a1d18e95c2f9ffcf11f4f9e198.pem",
+                        "UnsubscribeURL" : "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:105782521297:scale_test:893805c2-cafe-4340-ab24-f1c7525cab27"
+}
+{
+      "Type" : "Notification",
+        "MessageId" : "c2f3d2d7-150a-5be1-ac3f-9f6e40c12218",
+          "TopicArn" : "arn:aws:sns:us-east-1:105782521297:scale_test",
+            "Subject" : "Auto Scaling: launch for group \"testset\"",
+              "Message" : "{\"StatusCode\":\"InProgress\",\"Service\":\"AWS Auto Scaling\",\"AutoScalingGroupName\":\"testset\",\"Description\":\"Launching a new EC2 instance: i-3a8ff2c7\",\"ActivityId\":\"d7a97639-8630-4f25-9507-789852903500\",\"Event\":\"autoscaling:EC2_INSTANCE_LAUNCH\",\"Details\":{\"InvokingAlarms\":[{\"Region\":\"US - N.
+              Virginia\",\"AWSAccountId\":\"105782521297\",\"OldStateValue\":\"ALARM\",\"AlarmName\":\"awsec2-test-CPU-Utilization-no-noti\",\"AlarmDescription\":null,\"NewStateReason\":\"Threshold Crossed: 1 datapoint (99.50800000000001) was greater than or equal to the threshold
+              (60.0).\",\"StateChangeTime\":1430212810702,\"NewStateValue\":\"ALARM\",\"Trigger\":{\"Period\":300,\"Statistic\":\"AVERAGE\",\"MetricName\":\"CPUUtilization\",\"Threshold\":60,\"EvaluationPeriods\":1,\"Dimensions\":[{\"name\":\"AutoScalingGroupName\",\"value\":\"test\"}],\"Namespace\":\"AWS/EC2\",\"ComparisonOperator\":\"GreaterThanOrEqualToThreshold\",\"Unit\":null}}],\"Availability Zone\":\"us-east-1a\",\"Subnet
+              ID\":\"subnet-6b7e141c\"},\"AutoScalingGroupARN\":\"arn:aws:autoscaling:us-east-1:105782521297:autoScalingGroup:0273d5e9-cd82-49fd-8694-e2550fa26980:autoScalingGroupName/testset\",\"Progress\":50,\"Time\":\"2015-04-28T09:31:55.331Z\",\"AccountId\":\"105782521297\",\"RequestId\":\"d7a97639-8630-4f25-9507-789852903500\",\"StatusMessage\":\"\",\"EndTime\":\"2015-04-28T09:31:55.331Z\",\"EC2InstanceId\":\"i-3a8ff2c7\",\"StartTime\":\"2015-04-28T09:31:22.312Z\",\"Cause\":\"At
+              2015-04-28T09:31:07Z a monitor alarm awsec2-test-CPU-Utilization-no-noti in state ALARM triggered policy Increase Group Size changing the desired capacity from 1 to 2.  At 2015-04-28T09:31:16Z an instance was started in response to a difference between desired and actual capacity, increasing the capacity from 1 to 2.\"}",
+                "Timestamp" : "2015-04-28T09:31:55.380Z",
+                  "SignatureVersion" : "1",
+                    "Signature" : "A6Kk/jNz1flCam69iIxWqBMGr2bCPuop87GTd8rCMOyitDSYAnGspwV8drJJ5u1bmU/q42d7MoRXHQN1e8SNCKjlZFpZ473C838iwOkICZxYrZHvPS061fJ0t4Lfz9H/tdGeu91gEtbgLL/L7bMPrzh1CO7r9C7m97j6cX2KjndSUrwrEsqJYzmqfQUSOAnpLAipsthUTSJ1UOl8WL0V7rT/TF3y0UlKa0GF1Ciz1172FnFOoN5Zoy4Zsk9eusl3JyHEOfe4G46kaxE6j/ns95J1F4ObwyFpq8QAVNCjJvOZlz4ruEVkvQsEOk6UP3YXRE51/NhyQWIgvaEwbEMEuw==",
+                      "SigningCertURL" : "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-d6d679a1d18e95c2f9ffcf11f4f9e198.pem",
+                        "UnsubscribeURL" : "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:105782521297:scale_test:893805c2-cafe-4340-ab24-f1c7525cab27"
+}
+{
+      "Type" : "Notification",
+        "MessageId" : "c2f3d2d7-150a-5be1-ac3f-9f6e40c12218",
+          "TopicArn" : "arn:aws:sns:us-east-1:105782521297:scale_test",
+            "Subject" : "Auto Scaling: launch for group \"testset\"",
+              "Message" : "{\"StatusCode\":\"InProgress\",\"Service\":\"AWS Auto Scaling\",\"AutoScalingGroupName\":\"testset\",\"Description\":\"Launching a new EC2 instance: i-3a8ff2c7\",\"ActivityId\":\"d7a97639-8630-4f25-9507-789852903500\",\"Event\":\"autoscaling:EC2_INSTANCE_LAUNCH\",\"Details\":{\"InvokingAlarms\":[{\"Region\":\"US - N.
+              Virginia\",\"AWSAccountId\":\"105782521297\",\"OldStateValue\":\"ALARM\",\"AlarmName\":\"awsec2-test-CPU-Utilization-no-noti\",\"AlarmDescription\":null,\"NewStateReason\":\"Threshold Crossed: 1 datapoint (99.50800000000001) was greater than or equal to the threshold
+              (60.0).\",\"StateChangeTime\":1430212810702,\"NewStateValue\":\"ALARM\",\"Trigger\":{\"Period\":300,\"Statistic\":\"AVERAGE\",\"MetricName\":\"CPUUtilization\",\"Threshold\":60,\"EvaluationPeriods\":1,\"Dimensions\":[{\"name\":\"AutoScalingGroupName\",\"value\":\"test\"}],\"Namespace\":\"AWS/EC2\",\"ComparisonOperator\":\"GreaterThanOrEqualToThreshold\",\"Unit\":null}}],\"Availability Zone\":\"us-east-1a\",\"Subnet
+              ID\":\"subnet-6b7e141c\"},\"AutoScalingGroupARN\":\"arn:aws:autoscaling:us-east-1:105782521297:autoScalingGroup:0273d5e9-cd82-49fd-8694-e2550fa26980:autoScalingGroupName/testset\",\"Progress\":50,\"Time\":\"2015-04-28T09:31:55.331Z\",\"AccountId\":\"105782521297\",\"RequestId\":\"d7a97639-8630-4f25-9507-789852903500\",\"StatusMessage\":\"\",\"EndTime\":\"2015-04-28T09:31:55.331Z\",\"EC2InstanceId\":\"i-3a8ff2c7\",\"StartTime\":\"2015-04-28T09:31:22.312Z\",\"Cause\":\"At
+              2015-04-28T09:31:07Z a monitor alarm awsec2-test-CPU-Utilization-no-noti in state ALARM triggered policy Increase Group Size changing the desired capacity from 1 to 2.  At 2015-04-28T09:31:16Z an instance was started in response to a difference between desired and actual capacity, increasing the capacity from 1 to 2.\"}",
+                "Timestamp" : "2015-04-28T09:31:55.380Z",
+                  "SignatureVersion" : "1",
+                    "Signature" : "A6Kk/jNz1flCam69iIxWqBMGr2bCPuop87GTd8rCMOyitDSYAnGspwV8drJJ5u1bmU/q42d7MoRXHQN1e8SNCKjlZFpZ473C838iwOkICZxYrZHvPS061fJ0t4Lfz9H/tdGeu91gEtbgLL/L7bMPrzh1CO7r9C7m97j6cX2KjndSUrwrEsqJYzmqfQUSOAnpLAipsthUTSJ1UOl8WL0V7rT/TF3y0UlKa0GF1Ciz1172FnFOoN5Zoy4Zsk9eusl3JyHEOfe4G46kaxE6j/ns95J1F4ObwyFpq8QAVNCjJvOZlz4ruEVkvQsEOk6UP3YXRE51/NhyQWIgvaEwbEMEuw==",
+                      "SigningCertURL" : "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-d6d679a1d18e95c2f9ffcf11f4f9e198.pem",
+                        "UnsubscribeURL" : "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:105782521297:scale_test:893805c2-cafe-4340-ab24-f1c7525cab27"
+}
+{
+      "Type" : "Notification",
+        "MessageId" : "c2f3d2d7-150a-5be1-ac3f-9f6e40c12218",
+          "TopicArn" : "arn:aws:sns:us-east-1:105782521297:scale_test",
+            "Subject" : "Auto Scaling: launch for group \"testset\"",
+              "Message" : "{\"StatusCode\":\"InProgress\",\"Service\":\"AWS Auto Scaling\",\"AutoScalingGroupName\":\"testset\",\"Description\":\"Launching a new EC2 instance: i-3a8ff2c7\",\"ActivityId\":\"d7a97639-8630-4f25-9507-789852903500\",\"Event\":\"autoscaling:EC2_INSTANCE_LAUNCH\",\"Details\":{\"InvokingAlarms\":[{\"Region\":\"US - N.
+              Virginia\",\"AWSAccountId\":\"105782521297\",\"OldStateValue\":\"ALARM\",\"AlarmName\":\"awsec2-test-CPU-Utilization-no-noti\",\"AlarmDescription\":null,\"NewStateReason\":\"Threshold Crossed: 1 datapoint (99.50800000000001) was greater than or equal to the threshold
+              (60.0).\",\"StateChangeTime\":1430212810702,\"NewStateValue\":\"ALARM\",\"Trigger\":{\"Period\":300,\"Statistic\":\"AVERAGE\",\"MetricName\":\"CPUUtilization\",\"Threshold\":60,\"EvaluationPeriods\":1,\"Dimensions\":[{\"name\":\"AutoScalingGroupName\",\"value\":\"test\"}],\"Namespace\":\"AWS/EC2\",\"ComparisonOperator\":\"GreaterThanOrEqualToThreshold\",\"Unit\":null}}],\"Availability Zone\":\"us-east-1a\",\"Subnet
+              ID\":\"subnet-6b7e141c\"},\"AutoScalingGroupARN\":\"arn:aws:autoscaling:us-east-1:105782521297:autoScalingGroup:0273d5e9-cd82-49fd-8694-e2550fa26980:autoScalingGroupName/testset\",\"Progress\":50,\"Time\":\"2015-04-28T09:31:55.331Z\",\"AccountId\":\"105782521297\",\"RequestId\":\"d7a97639-8630-4f25-9507-789852903500\",\"StatusMessage\":\"\",\"EndTime\":\"2015-04-28T09:31:55.331Z\",\"EC2InstanceId\":\"i-3a8ff2c7\",\"StartTime\":\"2015-04-28T09:31:22.312Z\",\"Cause\":\"At
+              2015-04-28T09:31:07Z a monitor alarm awsec2-test-CPU-Utilization-no-noti in state ALARM triggered policy Increase Group Size changing the desired capacity from 1 to 2.  At 2015-04-28T09:31:16Z an instance was started in response to a difference between desired and actual capacity, increasing the capacity from 1 to 2.\"}",
+                "Timestamp" : "2015-04-28T09:31:55.380Z",
+                  "SignatureVersion" : "1",
+                    "Signature" : "A6Kk/jNz1flCam69iIxWqBMGr2bCPuop87GTd8rCMOyitDSYAnGspwV8drJJ5u1bmU/q42d7MoRXHQN1e8SNCKjlZFpZ473C838iwOkICZxYrZHvPS061fJ0t4Lfz9H/tdGeu91gEtbgLL/L7bMPrzh1CO7r9C7m97j6cX2KjndSUrwrEsqJYzmqfQUSOAnpLAipsthUTSJ1UOl8WL0V7rT/TF3y0UlKa0GF1Ciz1172FnFOoN5Zoy4Zsk9eusl3JyHEOfe4G46kaxE6j/ns95J1F4ObwyFpq8QAVNCjJvOZlz4ruEVkvQsEOk6UP3YXRE51/NhyQWIgvaEwbEMEuw==",
+                      "SigningCertURL" : "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-d6d679a1d18e95c2f9ffcf11f4f9e198.pem",
+                        "UnsubscribeURL" : "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:105782521297:scale_test:893805c2-cafe-4340-ab24-f1c7525cab27"
+}

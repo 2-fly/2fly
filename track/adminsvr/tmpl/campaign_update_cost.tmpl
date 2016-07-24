@@ -1,0 +1,84 @@
+<div id="updatepayoutModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <h4>${name}</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row-fluid">
+                <h6>last 5 history update</h6>
+                <div>
+                    <table id="history_payout" style="width:300px;text-align:center;">
+                    </table>
+                </div>
+                </br>
+
+                <div class="control-group">
+                    <div class="controls row-fluid">
+                        <label for="modal_start_time" class="control-label"><strong>start time</strong></label>
+                        <input type="text" name="modal_start_time" id="modal_start_time" value="">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="modal_timezone" class="control-label"><strong>timezone</strong></label>
+                    <div class="controls row-fluid">
+                        <select id="modal_timezone" name="modal_timezone"></select>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="modal_payout" class="control-label"><strong>payout</strong></label>
+                    <div class="controls row-fluid">
+                        <input type="text" id="modal_payout" name="modal_payout" value="${cost}">
+                    </div>
+                </div>
+        </div>
+    </div>
+        
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">close</button>
+        <input class="btn btn-primary" type="button" value="update" id="modal_update_payout">
+    </div>
+</div>
+
+<script>
+    $( document ).ready( function() {
+        $("#modal_start_time").kendoDateTimePicker({
+            value:new Date(),
+        });
+        CreateTimeZoneOption("modal_timezone");
+        $("#modal_timezone").kendoDropDownList();
+        $("#modal_timezone").data("kendoDropDownList").value(8);
+        //$("#modal_payout").kendoNumericTextBox({
+        //    format: "",
+        //});
+
+        $("#modal_update_payout").click(function(){
+                var picker = $("#modal_start_time").data("kendoDateTimePicker");
+                var date = new Date(picker.value());
+                var jsonurl = "/api/update_campaign_cost.json?cpid=" + encodeURIComponent(${cpid});
+                jsonurl += "&start_time=" + encodeURIComponent(parseInt(date.getTime()/1000));
+                jsonurl += "&timezone=" + encodeURIComponent($("#modal_timezone").val());
+                jsonurl += "&payout=" + encodeURIComponent($("#modal_payout").val());
+                var result = $.getJSON(jsonurl, function(data){
+            });
+            $('#updatepayoutModal').modal('hide');
+        });
+    });
+    function open_updatepayout_modal()
+    {
+        $('#updatepayoutModal').modal('show');
+        var jsonurl = "/api/update_campaign_cost_history.json?cpid=" + encodeURIComponent(${cpid});
+        var result = $.getJSON(jsonurl, function(data){
+            var history = document.getElementById("history_payout");
+            var html = "<tr><td>start time</td><td>timezone</td><td>payout</td><tr>";
+            for (var i in data["campaign"])
+            {
+                var obj = data["campaign"][i];
+                var h = "<tr>"
+                for (var j in obj)
+                    h += "<td>" + obj[j] + "</td>"
+                h += "</tr>";
+                html += h;
+            }
+            history.innerHTML = html;
+         });
+     }
+</script>

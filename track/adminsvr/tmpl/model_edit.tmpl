@@ -1,0 +1,136 @@
+<div class="row-fluid">
+    <ul class="nav nav-tabs">
+      <li>
+          <a href="${list_url}">List</a>
+      </li>
+      <li class="active">
+          <a href="javascript:void(0)">Edit</a>
+      </li>
+    </ul>                        
+</div>
+
+<div class="row-fluid">
+    <form action="" method="POST" class="form-horizontal" enctype="multipart/form-data">
+          <div class="control-group">
+            ${op_tips}
+          </div>
+
+        % for i in xrange(len(hidden_fields)):
+        <input id="${hidden_fields[i]['name']}" name="${hidden_fields[i]['name']}" type="hidden" value="${hidden_fields[i]['value']}">
+        % endfor
+ 
+
+        % for i in xrange(len(fields)):
+          <div class="control-group">
+            <label class="control-label" for="${fields[i]['name']}"><strong>${fields[i]['name']}</strong></label>
+            <div class="controls">
+              % if fields[i]['is_normal']:
+                % if fields[i]['is_multi']:
+                    <select id="${fields[i]['name']}-sel" name="${fields[i]['name']}-sel" multiple="multiple" class="multiselect">
+                        % for k, v in fields[i]['items']:
+                            <option value="${k}">${v}</option>
+                        % endfor
+                    </select>
+                    <input id="${fields[i]['name']}" name="${fields[i]['name']}" type="hidden" value="">
+                % elif fields[i]['is_disable']:
+                    <input id="${fields[i]['name']}" name="${fields[i]['name']}" type="text" value="${fields[i]['value']}" readonly>
+                % else:
+                    % if fields[i]['name'] == "timezone":
+                    <select id="timezone" name="timezone"></select>
+                    <script>
+                        $(document).ready(function() {
+                            CreateTimeZoneOption("timezone");
+                            $("#timezone").val("${fields[i]['value']}");
+                      })
+                    </script>
+                    %elif fields[i]['name'] == "country":
+                    <select id="country" name="country"></select>
+                    <script>
+                        $(document).ready(function() {
+                            CreateNationOption("country", ${country_config});
+                            $("#country").val("${fields[i]['value']}");
+                        })
+                    </script>
+                    %elif fields[i]['name']=="ad_server_domains":
+                        <div id="domains_container"></div>
+                        <input type="hidden" name="ad_server_domains" id="ad_server_domains" value="${fields[i]['value']}">
+                        <script>
+                            $(document).ready(function() {
+                                var data = "${fields[i]['value'] if fields[i]['value'] else ""}";
+                                 $("#domains_container").InitAddInputCompent({
+                                    dest:"ad_server_domains",
+                                    btn_txt:"add ad domains",
+                                    data:data,
+                                 });
+                            })
+                        </script>
+                    % else:
+                    <input id="${fields[i]['name']}" name="${fields[i]['name']}" type="text" value="${fields[i]['value']}">
+                    %endif
+                % endif
+              % else:
+                    <select id="${fields[i]['name']}" name="${fields[i]['name']}">
+                        <option selected="" value="__None"></option>
+                        % for k, v in fields[i]['items']:
+                            <option ${'selected=""' if k == fields[i]['value'] else ''} value="${k}">${v}</option>
+                        % endfor
+                    </select>
+              % endif
+              ${fields[i]['tips']}
+            </div>
+
+        </div>
+        % endfor
+ 
+        
+            <div class="control-group">
+              <div class="controls">
+                <input id="mysmt" type="submit" class="k-button btn-save" value="Submit">
+                <a href="${list_url}" class="k-button btn-cancel">Cancel</a>
+
+                <script type="text/javascript">
+
+                    function select2str(obj)
+                    {
+                            var data = obj.select2('data');
+                            var array = [];
+                            $.each(data, function(index, val) {
+                                array[index]=val.id;
+                                });
+                            return array.join(',');
+                    }
+
+
+
+                % for i in xrange(len(fields)):
+                    % if fields[i]['is_normal'] and fields[i]['is_multi']:
+                        var items = [${fields[i]['selected_items']}];
+                        $('#${fields[i]['name']}-sel').select2();
+                        $("#${fields[i]['name']}-sel").val([${fields[i]['selected_items']}]).trigger("change");
+                        $("#${fields[i]['name']}").val(items.join(','));
+                    % endif
+                % endfor
+
+                    % for i in xrange(len(fields)):
+                        % if fields[i]['is_normal'] and fields[i]['is_multi']:
+
+                            $("#${fields[i]['name']}-sel").on('change', function(){
+                                    var s = select2str($(this));
+                                    $("#${fields[i]['name']}").val( s );
+                            });
+
+                        % endif
+                    % endfor
+
+                </script>
+
+                <script type="text/javascript">
+                    $("#mysmt").click(function(){
+                    })
+                </script>
+
+
+              </div>
+            </div>
+    </form>            
+</div>

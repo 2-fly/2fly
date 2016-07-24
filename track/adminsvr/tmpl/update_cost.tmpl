@@ -1,0 +1,166 @@
+<script>
+    $(function()
+    {
+        function startUpdateCostChange()
+        {
+            var startDate = up_start.value(),
+                endDate = up_end.value();
+            if (startDate)
+            {
+                startDate = new Date(startDate);
+                startDate.setDate(startDate.getDate());
+                up_end.min(startDate);
+            }
+            else if (endDate)
+            {
+                startDate.max(new Date(endDate));
+            }
+            else
+            {
+                endDate = new Date();
+                up_start.max(endDate);
+                up_end.min(endDate); 
+            }
+        }
+
+        function endUpdateCostChange()
+        {
+            var endDate = up_end.value(),
+                startDate = up_start.value();
+            if (endDate)
+            {
+                endDate = new Date(endDate);
+                endDate.setDate(endDate.getDate());
+                up_start.max(endDate);
+            }
+            else if (startDate)
+            {
+                up_end.min(new Date(startDate));
+            }
+            else
+            {
+                endDate = new Date();
+                up_start.max(endDate);
+                up_end.min(endDate);
+            }
+        }
+
+        var up_start = $("#start_date").kendoDatePicker({
+                change : startUpdateCostChange
+            }).data("kendoDatePicker");
+        var up_end = $("#end_date").kendoDatePicker({
+                change : endUpdateCostChange 
+            }).data("kendoDatePicker");
+        up_start.max(up_end.value());
+        up_end.min(up_start.value());
+    });
+
+    function update_cost()
+    {
+        if (!check_updatecost_valid())
+            return;
+        var start_str = document.getElementById("start_date").value;
+        var end_str = document.getElementById("end_date").value;
+        var time_str = start_str + ' - ' + end_str;
+        refreshChartByUpdatecost(time_str);
+        $('#updatecostModal').modal('hide');
+    }
+
+    function open_updatecost_modal()
+    {
+        //$('#updatecostModal').modal().css({
+        //        width:'1000px',
+        //        'margin-left':function(){
+        //            return -($(this).width()/2);
+        //        }
+        //    });
+        CreateTimeZoneOption("choose_time_zone");
+        $('#updatecostModal').modal('show');
+    };
+
+    function check_updatecost_valid()
+    {
+        var campaign_id = document.getElementById("campaign_id").value;
+        if (isNaN(campaign_id))
+        {
+            alert("please choose one row data.");
+            return false;
+        }
+        var start_date = document.getElementById("start_date").value;
+        var end_date = document.getElementById("end_date").value;
+        if (start_date == "" || end_date == "")
+        {
+            alert("please choose start date and end date.");
+            return false;
+        }
+        if (start_date == end_date)
+        {
+            var start_hour = parseInt(document.getElementById("start_hour").value);
+            var end_hour = parseInt(document.getElementById("end_hour").value);
+            if (end_hour <= start_hour)
+            {
+                alert("end_hour must be bigger than start_hour.");
+                return false;
+            }
+        }
+
+        var cost = document.getElementById("cost").value;
+        if (isNaN(cost))
+        {
+            alert("please input number in the cost field.");
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+<div id="updatecostModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+           <h3 id="myModalLabel">Manual cost updating</h3>
+           <label id="campaign_name"></label>
+    </div>
+    <input id="campaign_id" name="campaign_id" type="hidden" value="-1" readonly>
+    <div class="modal-body">
+        <div class="control-group">
+            <label class="control-label" for="reservationtime_uc"><strong>Time Range</strong></label>
+             <div class="controls">
+                <input type="text" id="start_date" value="" name="start_date">
+                <select id="start_hour" name="start_hour">
+                    % for k in range_hours:
+                        <option value="${k}">${k}:00</option>
+                    % endfor
+                </select>
+                </br>
+                <input type="text" id="end_date" value="" name="end_date" >
+                <select id="end_hour" name="end_hour">
+                    % for k in range_hours:
+                        <option value="${k}">${k}:00</option>
+                    % endfor
+                </select>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="time_zone"><strong>Time Zone</strong></label>
+            <div class="controls">
+                <select id="choose_time_zone" name="choose_time_zone">
+                </select>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="label_cost"><strong>Cost</strong>
+                <input name="cost" id="cost" type="text" value=""/>
+            </label>
+        </div>
+        <div class="row-fluid">
+            <label class="control-label" for="restore_cost"><strong>Restore cost</strong>
+                <input name="restore_cost" type="checkbox" class="action-checkbox" value=""/> 
+            </label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">close</button>
+        <input class="btn btn-primary" type="button" value="commit" onclick="update_cost()">
+    </div>
+</div>

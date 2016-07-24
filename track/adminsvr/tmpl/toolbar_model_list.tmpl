@@ -1,0 +1,252 @@
+<div class="row-fluid">
+    <ul class="nav nav-tabs" >
+        <li class="active">
+        <a href="javascript:void(0)">List (<span id="list-n"></span>)</a>
+        </li>
+
+        <li>
+        <a href="${create_url}" target="_blank" title="Create new record">Create</a>
+        </li>
+        %if batch_upload_url:
+        <li>
+            <a href="${batch_upload_url}" title="Batch upload files">Batch Upload</a>
+        </li>
+        %endif
+
+    </ul>
+</div>
+
+
+<div class="row-fluid">
+    <div id="grid"></div>
+</div>
+<form id="myform" method="post" action="${set_hidden_url}">
+    <input id="ids" name="ids" type="hidden">
+    <input id="type" name="type" type="hidden">
+    <input id="back" name="back" type="hidden">
+</form>
+<style>
+    .edit-icon { height:15px;width:15px;margin:auto; }
+</style>
+<script src="/assets/admin/js/ZeroClipboard.min.js" type="text/javascript"></script>
+<script type="text/x-kendo-template" id="toolbar-tmp">
+    <div class="flow-fluid" style="padding:5px">
+        <button type=button id="select-all">Select All</button>
+        <button type=button id="hide">Hide</button>
+        <button type=button id="display">Display</button>
+        <div class="pull-right">
+            <input type="search" id="category" class='pull-right' style="width: 150px"/>
+            <label class="pull-right" style="line-height:30px" for="category">Show products by category:</label>
+        </div>
+    </div>
+</script>
+
+<script>
+    var fields = {edit_url:{type:"string"}};
+    var columns = [
+        {title:"   ", template:'<input type="checkbox" class="chkbx" />', width:"30px"},
+        {filterable:false, field:"edit_url", title:"   ", width:"29px", template:"<a class='edit-icon' href='#:edit_url#'><img src='/assets/image/edit-icon.png'></img></a>"}
+    ];
+    var large = ['uri', 'url', 'lander_domains_dist', 'track_domain'];
+    % for i in field_names:
+        fields['${i['name']}'] = {type: "${i['type']}"};
+        var col = {field:'${i['name']}', filterable:false, style: 'white-space: nowrap '};
+        if(large.indexOf("${i['name']}") > 0){
+            col.width = "280px";
+        } else if("${i['name']}" == "name") {
+            col.width = "200px";
+            col.filterable = true;
+        } else if("${i['name']}" == "uri") {
+            col.width = "250px";
+        } else {
+            if(fields['${i['name']}'].type == "string") {
+               col.width = "150px";
+            }
+            else
+                col.width = "90px";
+        }
+        if ("${i['name']}"== 'uri') {
+            col.template = "<span style='float:left;display:block;width:200px;white-space:nowrap; text-overflow:ellipsis;line-height:inherit;-o-text-overflow:ellipsis;overflow: hidden;'>#:uri#</span><a copy-full-uri style='line-height:inherit;text-decoration:underline;cursor:pointer;float:right;'>copy</a>";
+        } else if ("${i['name']}" == 'camp_num') {
+            col.template = "<a href='#:query_camp#' style='margin-left:10px;text-decoration:underline;' target='_Blank'>#:camp_num# campaigns</a>";
+        }
+        %if i.get("title"):
+            col.title = "${i['title']}";
+        %else:
+            col.title = '${i['name']}'.split("_").join(" "),
+        %endif
+        columns.push(col);
+    %endfor
+    <%
+        import ujson
+        datas = [dict(rec.pop('values'), **rec) for rec in records]
+        datas = ujson.dumps(datas)
+    %>
+    var datas = ${datas},
+        checkedIds = {};
+
+    function selectRow() {
+        var checked = this.checked,
+            row = $(this).closest("tr"),
+            grid = $("#grid").data("kendoGrid"),
+            dataItem = grid.dataItem(row);
+        checkedIds[dataItem.id] = checked;
+        if (checked) {
+            row.addClass("k-state-selected");
+            } else {
+            row.removeClass("k-state-selected");
+        }
+    }
+
+    $(document).ready(function () {
+        var grid = $("#grid").kendoGrid({
+            dataSource: {
+                data: datas,
+                schema: {model:{fields:fields}},
+                pageSize: 20
+            },
+            filterable: {
+                extra: false,
+                operators: {
+                    string: {
+                        contains: "Contains",
+                    }
+                }
+            },
+            dataBound:onDataBound,
+            toolbar: kendo.template($("#toolbar-tmp").html()),
+            resizable: true,
+            sortable: true,
+            pageable: {
+                pageSizes: true,
+                buttonCount: 5
+            },
+            columns: columns
+        });
+        grid.data("kendoGrid").table.on("click", "input.chkbx", selectRow);
+        grid.data("kendoGrid").dataSource.filter({ field: "hidden", operator: "eq", value: 0});
+        $("#list-n").text(grid.data("kendoGrid").dataSource.total());
+
+        var btn_selected = false;
+        grid.find("#select-all").kendoButton({
+            click:function() {
+                var res;
+                if(btn_selected) {
+                    $("#select-all").text("Select All");
+                    btn_selected = false;
+                } else {
+                    $("#select-all").text("Cancel All");
+                    btn_selected = true;
+                }
+
+                $("input.chkbx").each(function(i, v) {
+                    if($(v)[0].checked != btn_selected) {
+                        $(v).click();
+                    }
+                })
+            }
+        });
+
+        grid.find("#hide").kendoButton({
+            click:function() {
+                var checked = [];
+                for(var i in checkedIds){
+                    if(checkedIds[i]){
+                        checked.push(i);
+                    }
+                }
+                if(checked.length <= 0) {
+                    return;
+                }
+                $("#ids").val(checked.join(","));
+                $("#type").val("1");
+                $("#back").val(location.href);
+                $("#myform").submit();
+            }
+        });
+        grid.find("#display").kendoButton({
+            click:function() {
+                var checked = [];
+                for(var i in checkedIds){
+                    if(checkedIds[i]){
+                        checked.push(i);
+                    }
+                }
+                if(checked.length <= 0) {
+                    return;
+                }
+                $("#ids").val(checked.join(","));
+                $("#type").val("0");
+                $("#back").val(location.href);
+                $("#myform").submit();
+            }
+        });
+
+        dropdownlist = grid.find("#category").kendoDropDownList({
+            dataTextField: "text",
+            dataValueField: "value",
+            dataSource:{
+                data:[{text:'Display', value:"0"}, {text:'Hidden', value:"1"}, {text:'All', value:-1} ]
+            },
+            select: function(e) {
+                var item = this.dataItem(e.item)
+                var val = parseInt(item.value);
+                if (val >= 0) {
+                    grid.data("kendoGrid").dataSource.filter({ field: "hidden", operator: "eq", value: val});
+                    $("#list-n").text(grid.data("kendoGrid").dataSource.total());
+                } else {
+                    grid.data("kendoGrid").dataSource.filter({});
+                    $("#list-n").text(grid.data("kendoGrid").dataSource.total());
+                }
+            }
+        }).data("kendoDropDownList");
+
+        %if showAll:
+            dropdownlist.search("All");
+            grid.data("kendoGrid").dataSource.filter({});
+            $("#list-n").text(grid.data("kendoGrid").dataSource.total());
+        %endif
+
+        var t = grid.data("kendoGrid").table.find("a[copy-full-uri]");
+
+    });
+    var source_map = {};
+
+    function onDataBound() {
+        $("a[copy-full-uri]").each(copy_full_uri);
+    }
+
+    function copy_full_uri(_, a) {
+        %if get_source_url:
+        var clip_full = new ZeroClipboard($(a)),
+        row = $(a).closest("tr"),
+        grid = $("#grid").data("kendoGrid"),
+        dataItem = grid.dataItem(row);
+
+        clip_full.on( 'ready', function(event) {
+            clip_full.on( 'copy', function(event) {
+                var sid = dataItem.source_id || dataItem.admin_source_id;
+                if(sid.length == 0) {
+                  event.clipboardData.setData('text/plain', "http://" + dataItem.track_domain + dataItem.uri);
+                } else if(source_map[sid]) {
+                  event.clipboardData.setData('text/plain', "http://" + dataItem.track_domain + dataItem.uri + "?" + source_map[sid]);
+                } else {
+                    $.ajax({
+                        type:"GET",
+                        async: false,
+                        url:"${get_source_url}",
+                        data:{source_id:sid},
+                        success:function(msg) {
+                          source_map[sid] = msg;
+                          event.clipboardData.setData('text/plain', "http://" + dataItem.track_domain + dataItem.uri + "?" + msg);
+                        }
+                    });
+                }
+            });
+        });
+        %endif
+    }
+
+</script>
+
+

@@ -1,0 +1,159 @@
+ <div class="row-fluid">
+    <ul class="nav nav-tabs">
+      <li class="active">
+          <a href="javascript:void(0)">Edit</a>
+      </li>
+    </ul>
+</div>
+
+<div class="row-fluid">
+    <form action="${submit_url}" method="POST" class="form-horizontal" id="myform" enctype="multipart/form-data">
+        <div class="control-group">
+            ${ret}
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="time_zone" class="control-label"><strong>TimeZone</strong></label>
+            <div class="controls">
+                <select id="time_zone" name="time_zone"></select>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label"><strong></strong></label>
+            <div class="controls">
+                <div class="row-fluid">
+                    <input type="checkbox" id="select-all" style="margin-right:10px">
+                    <button type="button" id="verify">Verify All</button>
+                    <button type="button" id="virus">Virus All</button>
+                    <button type="button" id="hide">Hide</button>
+                    <button type="button" id="show">Show</button>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label"><strong>Track domains</strong></label>
+            <div class="controls">
+                <div id="track" ></div>
+                <input type="hidden" name="track_domains">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label"><strong>Lander domains</strong></label>
+            <div class="controls">
+                <div id="lander" style=""></div>
+                <input type="hidden" name="lander_domains">
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <button id="mysmt" type="button" class="k-button btn-save" value="Submit">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div id="loading"></div>
+
+<script src="/assets/massivaltable/jquery.select.js" type="text/javascript"/>
+<script src="/assets/admin/js/campaign.js" type="text/javascript"></script>
+<script src="/assets/admin/js/admin.js" type="text/javascript"></script>
+<script type="text/javascript" >
+    $( document ).ready( function() {
+        $("#loading").InitLoading();
+        CreateTimeZoneOption("time_zone");
+        $("select[name=time_zone]").val(${timezone});
+        var lander = "${lander_domains if lander_domains else ""}";
+        var lander_camp = ${lander_camp};
+
+        lander = $("#lander").InitDomainInputCompent({data:lander, btn_txt:"Add Lander Domains", camp:lander_camp, query_field:'lander_domain',query_url:"${query_lander_domain_url}",  has_check:true});
+        var track = "${track_domains if track_domains else ""}";
+
+        var track_camp = ${track_camp};
+        track = $("#track").InitDomainInputCompent({data:track, btn_txt:"Add Track Domains", camp:track_camp, has_check:true, query_field:'track_domain',query_url:"${query_lander_domain_url}"});
+        $("#hide").kendoButton({
+            click:function() { track.Hide(); lander.Hide(); return true;}
+        });
+        $("#show").kendoButton({
+            click:function() {track.Show();lander.Show(); return true;}
+        });
+
+        $("#verify").kendoButton({
+            click:function(){
+                VerifyAll({
+                    list:[track, lander],
+                    url:"${verify_url}",
+                    cb1:function() {
+                        $("#loading").show();
+                        $("#mysmt").attr("disabled", "disabled");
+                        $("#verify").attr("disabled", "disabled");
+                        $("#virus").attr("disabled", "disabled");
+                    },
+                    cb2:function() {
+                        $("#mysmt").removeAttr("disabled");
+                        $("#verify").removeAttr("disabled");
+                        $("#virus").removeAttr("disabled");
+                        $("#loading").hide();
+                    },
+                    cb3:function() {
+                        $("#mysmt").removeAttr("disabled");
+                        $("#verify").removeAttr("disabled");
+                        $("#virus").removeAttr("disabled");
+                        $("#loading").hide();
+                    },
+                    cb4:"VerifyRes"
+                });
+            }
+        });
+        $("#select-all").click(function() {
+            if(!$(this).is(":checked")) {
+                track.CancelAll();
+                lander.CancelAll();
+            } else{
+                track.SelectAll();
+                lander.SelectAll();
+            }
+       });
+       $("#select-all").click();
+
+        $("#virus").kendoButton({
+            click:function() {
+                VerifyAll({
+                    list:[track, lander],
+                    url:"${virus_url}",
+                    cb1:function() {
+                        $("#loading").show();
+                        $("#mysmt").attr("disabled", "disabled");
+                        $("#verify").attr("disabled", "disabled");
+                        $("#virus").attr("disabled", "disabled");
+                    },
+                    cb2:function() {
+                        $("#mysmt").removeAttr("disabled");
+                        $("#verify").removeAttr("disabled");
+                        $("#virus").removeAttr("disabled");
+                        $("#loading").hide();
+                    },
+                    cb3:function() {
+                        $("#mysmt").removeAttr("disabled");
+                        $("#verify").removeAttr("disabled");
+                        $("#virus").removeAttr("disabled");
+                        $("#loading").hide();
+                    },
+                    cb4:"VirusRes",
+                    max_len_once:30
+                });
+            }
+        });
+        $("#virus").click();
+
+        $("#mysmt").click(function() {
+             var val = lander.GetValue(),
+                 ret = true;
+             if(!val.ret) ret = false;
+             $("input[name=lander_domains]").val(val.data);
+             val = track.GetValue();
+             if(!val.ret) ret = false;
+             $("input[name=track_domains]").val(val.data);
+             if(!ret)
+                return false;
+             $("#myform").submit();
+         });
+     })
+</script>

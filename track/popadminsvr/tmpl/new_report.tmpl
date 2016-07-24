@@ -1,0 +1,1153 @@
+<div class="row-fluid">
+      <fieldset>
+        <div class="control-group">
+          <div class="controls">
+            <input name="report_start_date" id="report_start_date"  value="${date_range_start}" class="m_top_datepicker"/>
+            <select id="report_start_hour" class="m_top_datepicker" style="width:100px">
+                % for k in xrange(24):
+                    <option value="${k}">${k}:00</option>
+                % endfor
+            </select>
+            <input name="report_end_date" id="report_end_date" value="${date_range_end}" class="m_top_datepicker"/>
+            <select id="report_end_hour" class="m_top_datepicker" style="width:100px">
+                % for k in xrange(24):
+                    <option value="${k}">${k}:00</option>
+                % endfor
+            </select>
+            <select id="report_time_zone" name="report_time_zone" class="m_top_shortcuts"></select>
+            % if len(user_list) > 0:
+            <select id="select_user_list" class="m_user_list"></select>
+            %endif
+            <input id="report_search", type="button" value="Apply" onclick=report_search() class="m_search k-button"/>
+            <div class="input-prepend input-group">
+                <input id="qs_today" name="qs_today" type="button" value="Today" onclick=quick_search(1,false) class="m_search k-button">
+                <input id="qs_yesterday" name="qs_last_one_day" type="button" value="Yesterday" onclick=quick_search(2,true) class="m_search k-button" >
+                <input id="qs_last_three_days" name="qs_last_three_days" type="button" value="Last 3 days" onclick=quick_search(3,false) class="m_search k-button">
+                <input id="qs_last_seven_days" name="qs_last_seven_days" type="button" value="Last 7 days" onclick=quick_search(7,false) class="m_search k-button">
+            </div>
+          </div>
+        </div>
+    </fieldset>
+</div>
+
+##<hr/>
+<div id="loadpagediv" class="loadpagediv">
+</div>
+
+${report_str}
+<script src="/assets/admin/js/report.js"></script>
+
+<style >
+    form#window {
+        padding:20px 0;
+    }
+    form#window *{
+        box-sizing:border-box;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+    }
+
+    .form-control-label{
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        padding:7px 15px 0px 15px;
+        line-height:20px;
+    }
+
+    .k-state-selected a{
+        color:#c6c6c6;
+    }
+    .loadpagediv
+    {
+        display:none;
+        position:absolute;
+        top:50%;
+        left:50%;
+        width:15%;
+        height:20%;
+        text-align:center;
+        background-color:rgba(256,256,256,0.1);
+        background-image:url('/assets/image/loading.gif');
+        background-repeat:no-repeat;
+        background-position:center;
+        border:0px solid white;
+        color:black;
+        z-index:5000;
+    }
+    th, td { white-space: nowrap; }
+    td.highlight_green
+    {
+        font-weight: bold;
+        color: green;
+    }
+    td.highlight_red
+    {
+        font-weight: bold;
+        color: red;
+    }
+    .dataTables_wrapper .dataTables_filter {
+      float: left;
+      text-align: left;
+    }
+    .dataTables_wrapper .dataTables_length {
+      float: left;
+      margin-left:3.0em;
+    }
+    .dataTables_wrapper .dataTables_paginate {
+      float: left;
+      text-align: left;
+      margin-left:3.0em;
+    }
+    .m_top_datepicker{
+        margin-top:10px;
+        margin-left:5px;
+    }
+    .m_search{
+        margin-top:10px;
+        margin-left:5px;
+        background-color:#ffffff;
+        border-style:solid;
+        border-width:1px;
+        border-color:#cccccc;
+    }
+    .m_top_shortcuts{
+        margin-top:10px;
+        margin-left:8px;
+        background-color:#ffffff;
+    }
+    .m_filter_table{
+        margin-left:10px;
+    }
+    .m_user_list{
+        margin-top:10px;
+        margin-left:5px;
+        width:150px;
+    }
+
+</style>
+
+<script>
+    var filter = false;
+    var checkedIds = {};
+    var select_page_map = {}
+    function changeHtmlText(tag, trs_html)
+    {
+        document.getElementById(tag).innerHTML = trs_html;
+    }
+
+    $(document).ready(function ()
+    {
+        function startChange() {
+            var startDate = start.value(),
+                endDate = end.value();
+            if (startDate)
+            {
+                startDate = new Date(startDate);
+                startDate.setDate(startDate.getDate());
+                end.min(startDate);
+
+            }
+            else if (endDate)
+            {
+                startDate.max(new Date(endDate));
+            }
+            else
+            {
+                endDate = new Date();
+                start.max(endDate);
+                end.min(endDate);
+            }
+        }
+
+        function endChange()
+        {
+            var endDate = end.value(),
+                startDate = start.value();
+            if (endDate)
+            {
+                endDate = new Date(endDate);
+                endDate.setDate(endDate.getDate());
+                start.max(endDate);
+            }
+            else if (startDate)
+            {
+                end.min(new Date(startDate));
+            }
+            else
+            {
+                endDate = new Date();
+                start.max(endDate);
+                end.min(endDate);
+            }
+        }
+
+        start = $("#report_start_date").kendoDatePicker({
+                change : startChange
+            }).data("kendoDatePicker");
+        end = $("#report_end_date").kendoDatePicker({
+                change : endChange 
+            }).data("kendoDatePicker");
+        start.max(end.value());
+        end.min(start.value());
+        $("#report_start_hour").kendoDropDownList();
+        $("#report_start_hour").data("kendoDropDownList").value("${start_hour if start_hour else "0"}");
+        $("#report_end_hour").kendoDropDownList();
+        $("#report_end_hour").data("kendoDropDownList").value("${end_hour if end_hour else "23"}");
+
+        % if len(user_list) > 0:
+            $("#select_user_list").kendoDropDownList({
+                filter:"contains",
+                dataTextField:"text",
+                dataValueField:"val",
+                dataSource:[
+                    % for _info in user_list:
+                        {val:"${_info[0]}", text:"${_info[1]}"},
+                    %endfor 
+                ],
+            })
+            $("#select_user_list").data("kendoDropDownList").value("${user_id}");
+        % endif
+        init_timezone();
+        $("#report_time_zone").kendoDropDownList()
+
+        var start_str = document.getElementById("report_start_date").value;
+        var end_str = document.getElementById("report_end_date").value;
+        var time_str = start_str + " - " + end_str;
+
+        %for chart in charts:
+        init_chart(${chart});
+        %endfor
+        %for grid in grids:
+        init_grid(${grid});
+        %endfor
+  });
+
+  function initParameterMap(grid_info){
+      ret = {};
+      if(grid_info.tag == "datatable_website" && filter) {
+        var hours = $("#latest-hour").val(),
+        max_views = $("#views-max").val(),
+        min_views = $("#views-min").val(),
+        max_visits = $("#visits-max").val(),
+        min_visits = $("#visits-min").val(),
+        max_ctr = $("#ctr-max").val(),
+        min_ctr = $("#ctr-min").val();
+        if(hours && hours.trim().length) {ret.hours = hours.trim();}
+        if(max_views && max_views.trim().length) { ret.max_Views=max_views; }
+        if(min_views && min_views.trim().length) { ret.min_Views=min_views; }
+        if(max_visits && max_visits.trim().length) { ret.max_Visits=max_visits; }
+        if(min_visits && min_visits.trim().length) { ret.min_Visits=min_visits; }
+        if(max_ctr && max_ctr.trim().length) { ret.max_CTR=max_ctr; }
+        if(min_ctr && min_ctr.trim().length) { ret.min_CTR=min_ctr; }
+      }
+      return ret;
+  }
+
+  function change_website_list(grid_info, grid, op_type, cpid, list) {
+      var website_list = [],
+      kendoGrid = grid.data("kendoGrid"),
+      dataSource = kendoGrid.dataSource;
+      for(var i = 0; i < list.length; ++i) {
+          var item = dataSource.getByUid(list[i]);
+          if(!item) continue;
+          website_list.push(item.Website);
+      }
+      list = encodeURIComponent(website_list.join(","));
+      var url = "/poponads/change/campaign/website?cpid="+cpid+"&op_type="+op_type+"&list="+list;
+      $.getJSON(url, function(data) {
+          if(data.ret) {
+              grid.data("kendoGrid").dataSource.read();
+              checkedIds[grid_info.tag] = undefined;
+              select_page_map[grid_info.tag] = undefined;
+          }
+      });
+  }
+  function handle_fetch(grid_info, that, result) {
+      var grid = $("#"+grid_info.tag),
+      kendoGrid = grid.data("kendoGrid");
+      if(grid_info.tag == "datatable_website" && result.length) {
+          var has_include = kendoGrid.dataSource.get(1) ? true:false,
+          kendoDDL = grid.find("#category").data("kendoDropDownList"),
+          val = parseInt(kendoDDL.value());
+          if (val == 1) {
+              if( has_include){
+                  kendoGrid.dataSource.filter({ field: "clude", operator: "eq", value: 1});
+              } else {
+                  kendoGrid.dataSource.filter({ field: "clude", operator: "neq", value: 0});
+              }
+          } else if(val == 0) {
+              kendoGrid.dataSource.filter({ field: "clude", operator: "eq", value: 0});
+          } else {
+              kendoGrid.dataSource.filter({});
+          }
+      }
+  }
+
+  function init_chart(chart_info) {
+        var tag = chart_info.tag;
+        add_chart(tag + "_div", "");
+        var div = "#" + tag + "_div",
+            container = div + "_container";
+        $(div).append("<button type='button' id='"+tag+"_toggle'>Collapse Chart</button>");
+        $("#"+tag+"_toggle").kendoButton();
+        $("#"+tag+"_toggle").click(function() {
+            if($(container).is(":hidden")) {
+                $(this).text("Collapse Chart");
+                $(container).show(800);
+            } else {
+                $(this).text("Expand Chart");
+                $(container).hide(800);
+            }
+        });
+        $(div).append("<div style='margin:15px 0 0;' id='" + tag + "_div_container'></div>");
+        var chartIds = [];
+        if(chart_info.items && chart_info.items.length) {
+            var ul = '<ul class="inline"><li><select style="width:300px" id="' +tag+'_dropdown"></select></li>\
+                <li style="vertical-align:top;"><button class="btn" type="button" id="'+tag+'_filter">filter</button></li>\
+                <li style="vertical-align:top;"><button class="btn" type="button" id="'+tag+'_clear">clear</button></li></ul>';
+            $(container).append(ul);
+            var select = $("#"+tag+"_dropdown").kendoMultiSelect({
+                autoClose:false,
+                filter: "contains",
+                tagMode:"single",
+                tagTemplate: kendo.template($("#tagTemplate").html()),
+                placeholder: "Select Campaigns...",
+                dataTextField: "text",
+                dataValueField: "text",
+                dataSource: chart_info.items,
+            }).data("kendoMultiSelect");
+
+            $("#"+tag+"_filter").click(function() {
+                var filters = [];
+                var cpnames = select.value();
+
+                $.each(cpnames, function(_, cpname) {
+                    filters.push({field:"name", operator:"eq", value:cpname});
+                })
+                var filter = {filters:filters, logic:"or"};
+                $.each(chartIds, function(i, e) {
+                    $("#"+e).data("kendoChart").dataSource.filter(filter);
+                });
+            });
+            $("#"+tag+"_clear").click(function() {
+                select.value([]);
+                $.each(chartIds, function(i, e) {
+                    $("#"+e).data("kendoChart").dataSource.filter({});
+                });
+            });
+        }
+        var id = tag + "_chart";
+        $(container).append("<div id='"+id+"'></div>");
+        $("#"+id).kendoChart({
+                dataSource:{
+                    transport: {
+                        read: {
+                            url : "/api/async/summary/chart",
+                            dataType: "json"
+                        },
+                        parameterMap:function() {
+                            var timezone = document.getElementById("report_time_zone").value;
+                            var start_str = document.getElementById("report_start_date").value;
+                            var end_str = document.getElementById("report_end_date").value;
+                            var time_str = start_str + " - " + end_str;
+                            var s_hour = $("#report_start_hour").data("kendoDropDownList").value();
+                            var e_hour = $("#report_end_hour").data("kendoDropDownList").value();
+                            var ret = {
+                                timezone : timezone,
+                                time : time_str,
+                                start_hour: s_hour,
+                                end_hour: e_hour,
+                                % if len(user_list) > 0:
+                                username = $("#select_user_list option:selected").text(),
+                                %endif
+                                % if 'cpid' in args:
+                                cpid:${args['cpid']},
+                                %endif
+                                tag : chart_info.tag
+                            }
+                            return ret;
+                        }
+                    },
+                    group:{field:"name"},
+                    sort:chart_info['sort'],
+                },
+                theme:"bootstrap",
+                title: {
+                    text: chart_info['title'],
+                },
+                legend: {
+                    position: "bottom"
+                },
+                seriesDefaults: {
+                    type: "line",
+                    style:"smooth",
+                },
+                series:[{field:"value"}],
+                categoryAxis: {
+                    field:"time",
+                    majorGridLines: { visible: false },
+                    labels: { rotation: "auto" }
+                },
+                tooltip: {
+                    visible: true,
+                    template: "#= series.name #: #= value #"
+                }
+         });
+        chartIds.push(id);
+  }
+
+  function init_grid(grid_info){
+      if (${show_title})
+          add_datatable(grid_info.tag, grid_info.tag.substr(10, grid_info.tag.length-10));
+      else
+          add_datatable(grid_info.tag, "");   
+      var pageSize = 20;
+      if (grid_info['op']["paging"][1].length > 0) {
+          pageSize = grid_info['op']["paging"][1][1][0];
+      }
+      var grid = $('#'+grid_info.tag);
+      var info = handle_grid_items(grid_info);
+      var kendoGrid = grid.kendoGrid({
+          dataSource:{
+              transport: {
+                  read: function(options) {
+                      var url = "/api/async/summary";
+                      var timezone = document.getElementById("report_time_zone").value;
+                      var start_str = document.getElementById("report_start_date").value;
+                      var end_str = document.getElementById("report_end_date").value;
+                      var s_hour = $("#report_start_hour").data("kendoDropDownList").value()
+                      var e_hour = $("#report_end_hour").data("kendoDropDownList").value()
+                      var time_str = start_str + " - " + end_str;
+                      var ret = {
+                          timezone : timezone,
+                          time : time_str,
+                          start_hour : s_hour,
+                          end_hour : e_hour,
+                          % if len(user_list) > 0:
+                          username = $("#select_user_list option:selected").text(),
+                          %endif
+                          % if 'cpid' in args:
+                          cpid:${args['cpid']},
+                          %endif
+                          tag : grid_info.tag
+                      }
+                      ret = $.extend(ret, initParameterMap(grid_info));
+                      var param = $.param(ret);
+                      if(param.length){
+                          url = url + "?" + param;
+                      }
+                      $.ajax({
+                          url:url,
+                          dataType:"jsonp",
+                          success:function(result) {
+                              options.success(result);
+                              handle_fetch(grid_info, this, result);
+                          }
+                      });
+                  },
+              } ,
+              pageSize : 20,
+              sort :make_default_sort(grid_info.sort),
+              schema: info['schema'],
+              change:getEditHandler(grid_info),
+          },
+          autoBind:false,
+          pageable : {
+            numeric : true,
+            pageSize:20,
+            pageSizes : grid_info['op']["paging"][1][1],
+            buttonCount : 5,
+          },
+          filterable: {
+              extra: false,
+              operators: {
+                  string: {
+                      contains: "Contains",
+                      eq: "Equals",
+                  }
+              }
+          },
+          toolbar : make_toolbar(grid_info),
+          selectable : true,
+          editable: grid_info.edit,
+          sortable: true,
+          resizable : true,
+          columns : make_columns_format(grid_info),
+          dataBound : function(arg) {
+            var start_str = document.getElementById("report_start_date").value;
+            var end_str = document.getElementById("report_end_date").value;
+            var time_str = start_str + " - " + end_str;
+            onDataBound(arg, grid_info, time_str, this);
+            initPjaxTag($("a[data-pjax]"), "#content-inner");
+          }
+      }).data("kendoGrid");
+      finish_init_grid(grid_info);
+  }
+
+    function getEditHandler(grid_info) {
+        if(grid_info.tag == "datatable_website") {
+            return function(e) {
+                if(e.action == "itemchange") {
+                    change_data = change_data.concat(e.items);
+                }
+            }
+        }
+    }
+
+    function onClose() {
+        $("#filter-condition").fadeIn();
+    }
+
+    function getSelectRowFunc(grid_info) {
+        return function() {
+            var checked = this.checked,
+                row = $(this).closest("tr"),
+                grid = $("#datatable_website").data("kendoGrid"),
+                dataItem = grid.dataItem(row);
+            if(!checkedIds[grid_info.tag]) {
+                checkedIds[grid_info.tag] = {};
+            }
+            checkedIds[grid_info.tag][dataItem.uid] = checked;
+            if (checked) {
+                row.addClass("k-state-selected");
+                } else {
+                row.removeClass("k-state-selected");
+            }
+        }
+    }
+
+    function finish_init_website_grid(grid_info){
+        var grid = $("#datatable_website"),
+            kendoGrid = grid.data("kendoGrid");
+        select_page_map[grid_info.tag] = {};
+        kendoGrid.table.on("click", "input.chkbx", getSelectRowFunc(grid_info));
+
+        grid.find("#select-all").click(function(e) {
+            var selected = e.target.checked;
+            var page = kendoGrid.dataSource.page();
+            grid.find("input.chkbx").each(function(i, v) {
+                if($(v)[0].checked != selected) {
+                    $(v).click();
+                }
+            })
+            select_page_map[grid_info.tag][page] = selected;
+        });
+        grid.find("#add-include").kendoButton({
+            click:function() {
+                var checked = [];
+                for(var i in checkedIds[grid_info.tag]){
+                    if(checkedIds[grid_info.tag][i]){
+                        checked.push(i);
+                    }
+                }
+                if(checked.length <= 0) {
+                    return;
+                }
+                change_website_list(grid_info, grid, "add-include", ${args.get("cpid", -1)}, checked);
+            }
+        });
+        grid.find("#rm-include").kendoButton({
+            click:function() {
+                var checked = [];
+                for(var i in checkedIds[grid_info.tag]){
+                    if(checkedIds[grid_info.tag][i]){
+                        checked.push(i);
+                    }
+                }
+                if(checked.length <= 0) {
+                    return;
+                }
+                change_website_list(grid_info, grid, "rm-include", ${args.get("cpid", -1)}, checked);
+            }
+        });
+        grid.find("#add-exclude").kendoButton({
+            click:function() {
+                var checked = [];
+                for(var i in checkedIds[grid_info.tag]){
+                    if(checkedIds[grid_info.tag][i]){
+                        checked.push(i);
+                    }
+                }
+                if(checked.length <= 0) {
+                    return;
+                }
+                change_website_list(grid_info, grid, "add-exclude", ${args.get("cpid", -1)}, checked);
+            }
+        });
+        grid.find("#filter-condition").kendoButton({
+            click:function() {
+                $("#window").data("kendoWindow").open();
+                $("#filter-condition").fadeOut();
+            }
+        });
+        grid.find("#clear-condition").kendoButton({
+            click:function() {
+                $("#window input").each(function(_, e) {$(e).val("");});
+                kendoGrid.dataSource.read();
+            }
+        });
+        change_data = [];
+        grid.find("#update-bid").kendoButton({
+            click:function() {
+                if(change_data.length == 0) {
+                    return;
+                }
+                var data = [];
+                for(var i in change_data) {
+                    w_data = change_data[i];
+                    data.push(w_data.website + ":" + w_data.Bid +":"+ w_data.Budget);
+                }
+                var s = data.join(",");
+                var post_data = {"cpid":${args.get("cpid", -1)}, "data":s}
+
+                var url = "/poponads/change/website/bid";
+                $.post(url, post_data, function(ret_data) {
+                    if(ret_data.ret) {
+                        grid.data("kendoGrid").refresh();
+                        change_data = []
+                    }
+                });
+            }
+        });
+        $("#window").kendoWindow({
+            width: "800px",
+            title: "About Alvar Aalto",
+            visible: false,
+            actions: [ "Pin", "Minimize", "Maximize", "Close" ],
+            close: onClose
+        }).data("kendoWindow").center();
+        $("#mysmt").click(function() {
+            var hours = $("#latest-hour").val();
+            if(!hours || hours.trim().length == 0) {
+                $("#latest-hour").parent().addClass("has-error")
+                return
+            }
+            filter = true;
+            kendoGrid.dataSource.read();
+            filter = false;
+            $("#window").data("kendoWindow").close();
+        });
+
+        var dropdownlist = grid.find("#category").kendoDropDownList({
+            dataTextField: "text",
+            dataValueField: "value",
+            dataSource:{
+                data:[{text:'Exclude', value:"0"}, {text:'Include', value:"1"}, {text:'All', value:-1} ]
+            },
+            select: function(e) {
+                var item = this.dataItem(e.item)
+                var val = parseInt(item.value);
+                if (val == 1) {
+                    if( grid_info.args.has_include){
+                        kendoGrid.dataSource.filter({ field: "clude", operator: "eq", value: 1});
+                    } else {
+                        kendoGrid.dataSource.filter({ field: "clude", operator: "neq", value: 0});
+                    }
+                } else if(val == 0) {
+                    kendoGrid.dataSource.filter({ field: "clude", operator: "eq", value: 0});
+                } else {
+                    kendoGrid.dataSource.filter({});
+                }
+            }
+        }).data("kendoDropDownList");
+        dropdownlist.select(1);
+    }
+
+    function finish_init_grid(grid_info) {
+        if(grid_info.tag == "datatable_website") {
+            finish_init_website_grid(grid_info);
+            $("#"+grid_info.tag).data("kendoGrid").dataSource.read();
+        } else if(grid_info.tag == "datatable_banner") {
+            var grid = $("#"+grid_info.tag);
+            var tooltip = grid.kendoTooltip({
+                filter: "a.image-url",
+                position: "right",
+                content: function(e) {
+                    var tr = e.target.closest("tr");
+                    var dataItem = Grid.data("kendoGrid").dataItem(tr);
+                    var html = "<img src='"+dataItem.ImageUrl+"'>";
+                    return html;
+                },
+            }).data("kendoTooltip");
+            $("#"+grid_info.tag).data("kendoGrid").dataSource.read();
+        } else {
+            $("#"+grid_info.tag).data("kendoGrid").dataSource.read();
+        }
+  }
+
+  function make_toolbar(grid_info){
+      var toolbar = grid_info.toolbar;
+      if(!toolbar) {
+          return null;
+      } else if(toolbar == "custom") {
+          return kendo.template($("#"+grid_info.tag+"-toolbar-tmp").html());
+      } else {
+          return null;
+      }
+  }
+
+  function handle_grid_items(grid_info) {
+      var fields = {};
+      var schema_id = null;
+      for(var i in grid_info.fields) {
+          var item = grid_info.fields[i]
+          if(typeof(item) == 'object') {
+              if(item.is_key){
+                  schema_id = item.field
+              }
+              if(item.type) continue;
+              field = {nullable:true};
+              field.editable = item.edit ? true:false;
+              fields[item.field] = field
+          } else {
+              fields[item] = {editable:false, nullable:true};
+          }
+      }
+      if(!schema_id) {
+          schema_id = typeof(grid_info.fields[0]) == 'string' ? grid_info.fields[0]:grid_info.fields[0].field
+      }
+      var schema = {model:{id:schema_id, fields:fields}};
+      return {schema: schema}
+  }
+
+  function make_default_sort(data)
+  {
+      var result = [];
+      for (var i = 0; i < data.length; i++)
+      {
+          var tmp = {
+              field : data[i][0],
+              dir : data[i][1],
+          };
+          result.push(tmp);
+      }
+      return result;
+  }
+
+  function init_timezone()
+  {
+      CreateTimeZoneOption("report_time_zone");
+      var opts = document.getElementById("report_time_zone").getElementsByTagName("option");
+      var index = ${timezone} + 12;
+      if (opts.length > index)
+      {
+        opts[index].selected = true;
+      }
+  }
+
+  function report_search() {
+      $("div[data-role=chart]").each(function(i, e) {
+          var chart = $(e).data("kendoChart");
+          chart.dataSource.read();
+      })
+      $("div[data-role=grid]").each(function(i, e) {
+          var grid = $(e).data("kendoGrid");
+          grid.dataSource.read();
+      })
+  }
+
+  function get_date_format(date, format) {
+      var result = (date.getMonth() + 1) + format + date.getDate() + format + date.getFullYear();
+      return result;
+  }
+
+  function get_col_format_color(tag, format_cols, index, bd) {
+        for (var i = 0; i < format_cols.length; i++)
+        {
+            var col = format_cols[i]["col"];
+            if(tag == "datatable_website"){
+                //col++;
+            }
+            var reg = format_cols[i]["reg"];
+            if (index == col)
+            {
+                var v = parseFloat(bd);
+                if (v > 0.0)
+                    return "green";
+                else if (v < 0.0)
+                    return "red";
+                else
+                    return "black";
+            }
+        }
+        return "black";
+    }
+
+  function make_columns_format(grid_info) {
+        var columns = []
+        var fields = grid_info['fields'];
+        var format_cols = grid_info["col_format"];
+        var format = grid_info['tmp_format'];
+        var filter = grid_info["filter"];
+        var head = grid_info["head"];
+        var table_bottom =  grid_info["bottom_static"];
+        var tag = grid_info['tag'];
+        var hyperlink = {};
+        var filter_link_tag = ["datatable_campaign", "datatable_offer", "datatable_event_campaign_report", "datatable_event_offer_report", "datatable_event_valve_offer_report"];
+        for (var i = 0; i < fields.length; i++)
+        {
+            var type = typeof(fields[i]) == 'object'? fields[i].type:"";
+            if(type == "checkbox") {
+                columns.push({title:"", template:'<input type="checkbox" class="chkbx" />', width:"30px", headerTemplate: '<input type="checkbox" id="select-all" />'});
+                continue;
+            }
+            var item = typeof(fields[i]) == 'object'? fields[i].field:fields[i];
+            var hidden = typeof(fields[i]) == 'object'? fields[i].hidden:false;
+            var col = {}
+            col["field"] = item;
+            if(hidden) {
+                col.hidden = true;
+            }
+
+            if (table_bottom) {
+                var val = table_bottom[item];
+                if(!val || val == undefined) val = "";
+                if (format.hasOwnProperty(item) && format[item] != "custom") {
+                    var color = get_col_format_color(tag, format_cols, i, table_bottom[item]);
+                    col["footerTemplate"] = "<font color=\""+ color + "\"> #= kendo.format(\"{0:" + format[item] + "}\"" + val.toString() + ")#</font>";
+                }
+                else
+                    col["footerTemplate"] = val;
+            }
+            if (format.hasOwnProperty(item))
+            {
+                if(format[item] == "custom") {
+                    col["template"] = kendo.template($("#"+item).html())
+                } else {
+                    col["format"] = "{0:" + format[item] + "}";
+                }
+            }
+            if (hyperlink.hasOwnProperty(item))
+            {
+                if ($.inArray(tag, filter_link_tag) < 0)
+                {
+                    template_tmpl = hyperlink[item];
+                    col["template"] = kendo.template($(template_tmpl).html());
+                }
+            }
+            if (filter.hasOwnProperty(i))
+            {
+                col["filterable"] = {
+                    "cell" : {"operator":filter[i]}
+                }
+            }
+            else
+            {
+                col["filterable"] = false;
+            }
+            if(["Date", 'Hour', "Campaign", "Website", 'OS', 'Country', 'Browser'].indexOf(item) >= 0) {
+                col['width'] = 180;
+                if(item == "Campaign" && tag == "datatable_website") {
+                    col['template'] = "<a href='/poponads/rtbcampaign/edit?id=#=cpid#' target='_blank'>#=Campaign#</a>";
+                }
+            } else if("ImageUrl" == item) {
+                col['template'] = kendo.template($("#image-url-tmpl").html());
+                col['width'] = 250;
+            } else {
+                col['width'] = 90;
+            }
+            
+            columns.push(col);
+        }
+        return columns;
+  }
+
+  function quick_search(days, single) {
+      var cpid = ${args.get("cpid", -1)};
+      var d_oid_name = "${args.get("d_oid_name", 'empty')}"
+      var oid = ${args.get("oid",-1)};
+      var time_str = '';
+      var start_times = 0;
+      var end_times = 0;
+      var start_str = "";
+      var end_str = "";
+      if (!single)
+      {
+          var date = new Date();
+          end_times = date.getTime() / 1000;
+          start_times = end_times - 3600 * 24 * (days-1);
+          end_str = get_date_format(date, '/');
+          start_str = get_date_format(new Date(start_times*1000), '/');
+          start.max(end_str);
+          end.min(start_str);
+          start.value(start_str);
+          end.value(end_str);
+      }
+      else
+      {
+          var date = new Date();
+          var now = date.getTime() / 1000;
+          start_times = now - 3600 * 24 * (days-1);
+          end_times = start_times;
+          start_str = get_date_format(new Date(start_times*1000), '/');
+          end_str = start_str;
+          start.max(end_str);
+          end.min(start_str);
+          start.value(start_str);
+          end.value(end_str);
+      }
+      var s_hour = $("#report_start_hour").data("kendoDropDownList").value("0");
+      var e_hour = $("#report_end_hour").data("kendoDropDownList").value("23");
+      $("div[data-role=chart]").each(function(i, e) {
+          var chart = $(e).data("kendoChart");
+          chart.dataSource.read();
+      })
+      $("div[data-role=grid]").each(function(i, e) {
+          var grid = $(e).data("kendoGrid");
+          grid.dataSource.read();
+      })
+
+  }
+
+  function addStatic(total, head, source) {
+        var len = head.length;
+        for (var i = 1; i < len; ++i)
+        {
+            if (head[i] == "Price") {
+                total[head[i]] = source[head[i]];
+            } else {
+                var data_type = typeof source[head[i]];
+                if (data_type == "string")
+                    total[head[i]] = "";
+                else if (data_type == "number")
+                    total[head[i]] = total[head[i]] + source[head[i]];
+                else
+                    total[head[i]] = "";
+            }
+        }
+        return total;
+    }
+
+  function calTotalStatic(total) {
+        if (total['Views'] != 0) {
+            total['CPM'] = 1000*total['Cost'] / total['Views'];
+            total['CTR'] = total['Clicks'] / total['Views'];
+            total['CV'] = total['Convs'] / total['Views'];
+            total['EPM'] = 1000*total['Revenue'] / total['Views'];
+        }
+        if(total['Bids'] != 0) {
+            total['WR'] = total['Views'] / total['Bids'];
+        }
+
+        if (total['Cost'] != 0.0) {
+            total['ROI'] = total['Profit'] / total['Cost'];
+        }
+
+        if (total['Clicks'] != 0) {
+            total['CR'] = total['Convs'] / total['Clicks'];
+            total['EPC'] = 1000*total['Revenue'] / total['Clicks'];
+        }
+
+        if (total['Convs'] != 0) {
+            total['AP'] = total['Revenue'] / total['Convs'];
+        }
+        return total;
+    }
+
+  function onDataBound(arg, grid_info, time_str, grid) {
+        var len = arg.sender.tbody[0].childNodes.length;
+        var tag = grid_info['tag'];
+        var fields = grid_info["fields"];
+        var format_cols = grid_info["col_format"];
+        var format = grid_info['tmp_format'];
+        var table_bottom =  grid_info["bottom_static"];
+        var total = {}
+        for (var i = 0; i < fields.length; ++i)
+        {
+            var item = fields[i];
+            if(typeof(item) == "object") {
+                if(item.hidden) continue;
+                if(item.type) continue;
+                item = fields[i].field;
+            }
+            total[item] = 0;
+        }
+        for (var i = 0; i < len; i++)
+        {
+            var row = arg.sender.tbody[0].childNodes[i];
+            make_col_format2(tag, format_cols, row, arg.sender._data[i], fields);
+            make_hytext(grid_info, time_str, row, arg.sender._data[i]);
+            total = addStatic(total, fields, arg.sender._data[i]);
+        }
+        var view = grid.dataSource.view();
+        for(var i = 0; i < view.length;i++){
+            if(checkedIds[grid_info.tag] && checkedIds[grid_info.tag][view[i].uid]){
+                grid.tbody.find("tr[data-uid='" + view[i].uid + "']")
+                .addClass("k-state-selected")
+                .find(".chkbx")
+                .attr("checked","checked");
+            }
+        }
+        var tag_map = select_page_map[tag];
+        if(tag_map && tag_map[arg.sender.dataSource.page()]) {
+            var selected = tag_map[arg.sender.dataSource.page()];
+            $("#"+tag).find("#select-all")[0].checked = selected;
+        } else {
+            var chkbx = $("#"+tag).find("#select-all")[0];
+            if(chkbx) {
+                chkbx.checked = false;
+            }
+        }
+        if (!table_bottom) return;
+        calTotalStatic(total);
+        var j = 0;
+        for (var i = 0; i < fields.length; ++i) {
+            var item = fields[i];
+            item = typeof(item) == "object" ? item.field:item;
+            if(typeof(item) == "object") {
+                if(item.hidden) {
+                    j++;
+                    continue;
+                }
+                item = item.field;
+            }
+            var x = i - j;
+            var color = get_col_format_color(tag, format_cols, i, total[item]);
+            var default_val = table_bottom[item];
+            var html = ""
+            if(default_val != undefined){
+                html = "<font color='"+ color + "'>" + default_val + "</font>";
+            } else {
+                var d = kendo.toString(total[item], format[item]);
+                html = "<font color='"+ color + "'>" + d + "</font>";
+            }
+            arg.sender.footer[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[x].innerHTML = html;
+        }
+    }
+
+  function make_col_format2(tag, format_cols, row, data, head)
+    {
+        for (var i = 0; i < format_cols.length; i++)
+        {
+            var col = format_cols[i]["col"];
+            var reg = format_cols[i]["reg"];
+            var h = head[col];
+            var v = data[h]
+            if (parseFloat(v) > 0.0)
+            {
+                $('td', row).eq(col).addClass('highlight_green');
+            }
+            else if (parseFloat(v) < 0.0)
+            {
+                $('td', row).eq(col).addClass('highlight_red');
+            }
+        }
+    }
+
+  function make_hytext(grid_info, time_str, row)
+    {
+        var tag = grid_info.tag,
+            head = grid_info.head,
+            fields = grid_info.fields;
+        
+        if (tag == "datatable_campaign" || tag == "datatable_event_campaign_report") {
+            var index = 0;
+            var timezone = document.getElementById("report_time_zone").value;
+            var name = row.childNodes[index].innerHTML;
+            var len = row.childNodes.length;
+            var cpid = row.childNodes[len - 1].innerText;
+            var username = $("#select_user_list option:selected").text();
+
+            var s_hour = $("#report_start_hour").data("kendoDropDownList").value();
+            var e_hour = $("#report_end_hour").data("kendoDropDownList").value();
+            row.childNodes[index].innerHTML = "<a data-pjax href=\"campaign/date?username="+username+"&time_str="+encodeURIComponent(time_str)+"&start_hour="+s_hour+"&end_hour="+e_hour+"&cpid="+cpid+"&timezone="+timezone+"\">"+name+"</a>"
+        }
+    }
+
+</script>
+<script id="image-url-tmpl" type="text/x-kendo-tmpl">
+#if(ImageUrl == "Unknow" || !isNaN(ImageUrl)) {#
+    #=ImageUrl#
+#} else {#
+#var tmp = ImageUrl.split("/")#
+#var image = tmp[tmp.length - 1]#
+    <a href="\#" class="image-url">#=image#</a>
+#}#
+</script>
+
+<script id="tagTemplate" type="text/x-kendo-template">
+    # if (values.length < 3) { #
+        # for (var idx = 0; idx < values.length; idx++) { #
+            #:values[idx]#
+            # if (idx < values.length - 1) {#, # } #
+        # } #
+    # } else { #
+       #:values.length# items selected out of #:maxTotal#
+    # } #
+</script>
+
+<script id="BudgetRate" type="text/x-kendo-tmpl">
+    #var c = "black";#
+    #if(BudgetRate >= 0.9){#
+        # c = "red";#
+    #}else if(BudgetRate >= 0.8){#
+        # c = "orange";#
+    #}else{#
+    #}#
+    #var budget = kendo.toString(BudgetRate, "p2");#
+    <font color=#=c#>#=budget#</font>
+</script>
+
+<script id="CBudget" type="text/x-kendo-tmpl">
+    #var tmpList = CBudget.split("_");#
+    #var percent = parseFloat(tmpList[0]);#
+    #var c = tmpList[1];#
+    #var budget = kendo.toString(percent, "p2");#
+    <font color=#=c#>#=budget#</font>
+</script>
+
+<script type="text/x-kendo-template" id="datatable_website-toolbar-tmp">
+    <div class="flow-fluid" style="padding:5px">
+        <button type=button id="add-include">Add Include</button>
+        <button type=button id="rm-include">Remove Include</button>
+        <button type=button id="add-exclude">Add Exclude</button>
+        <form id="window" class="form-horizontal">
+              <div class="form-group">
+                <label for="latest-hour" class="col-sm-2 control-label">Latest Hours</label>
+                <div class="col-sm-9">
+                  <input id="latest-hour" class="form-control form-control-input" placeholder="latest hours to filter...">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="views-max" class="col-sm-2 control-label">Views</label>
+                <div class="col-sm-9 clearfix">
+                  <label class="pull-left form-control-label" >Max : </label>
+                  <input id="views-max" class="pull-left form-control form-control-input" style="width:80px" placeholder="max...">
+                  <label class="pull-left form-control-label" style="pedding:7px 15px 0 15px;line-height:20px">Min : </label>
+                  <input id="views-min" class="pull-left form-control form-control-input" style="width:80px" placeholder="max...">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="visits-max" class="col-sm-2 control-label">Visits</label>
+                <div class="col-sm-9 clearfix">
+                  <label class="pull-left form-control-label" >Max : </label>
+                  <input id="visits-max" class="pull-left form-control form-control-input" style="width:80px" placeholder="max...">
+                  <label class="pull-left form-control-label" style="pedding:7px 15px 0 15px;line-height:20px">Min : </label>
+                  <input id="visits-min" class="pull-left form-control form-control-input" style="width:80px" placeholder="max...">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="ctr-max" class="col-sm-2 control-label">CTR</label>
+                <div class="col-sm-9 clearfix">
+                  <label class="pull-left form-control-label" >Max : </label>
+                  <input id="ctr-max" class="pull-left form-control form-control-input" style="width:80px" placeholder="max...">
+                  <label class="pull-left form-control-label" style="pedding:7px 15px 0 15px;line-height:20px">Min : </label>
+                  <input id="ctr-min" class="pull-left form-control form-control-input" style="width:80px" placeholder="max...">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button type="button" id="mysmt" class="btn btn-default">Filter</button>
+                </div>
+              </div>
+        </form>
+        <button type=button id="filter-condition">Filter</button>
+        <button type=button id="clear-condition">Clear Filter</button>
+        <button type=button id="update-bid">Update Bid</button>
+        <div class="pull-right">
+            <input type="search" id="category" class='pull-right' style="width: 150px"/>
+            <label class="pull-right" style="line-height:30px" for="category">Show products by category:</label>
+        </div>
+    </div>
+</script>

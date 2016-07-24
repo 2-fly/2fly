@@ -1,0 +1,24 @@
+#!/usr/bin/expect
+
+set timeout 10000
+set remhost [lindex $argv 0]
+
+spawn ssh ec2-user@$remhost
+expect {
+ "(yes/no)?"
+   {
+     send "yes\n"
+     expect "*ec2-user*" {send "sudo su\r"}
+   }
+  "*ec2-user*" {send "sudo su\r"}
+}
+expect "*#"
+send "sed -i '/requiretty/d' /etc/sudoers\r"
+expect "*#"
+send "nohup bash /home/ec2-user/massival/linksvr/conf/ami_install.sh >> /var/log/install.log 2>&1 &\r"
+expect "*#"
+send "exit\r"
+expect "*ec2-user*"
+send "exit\r"
+
+expect eof

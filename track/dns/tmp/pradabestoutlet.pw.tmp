@@ -1,0 +1,26 @@
+{
+    "HostedZone": {
+        "ResourceRecordSetCount": 2,
+        "CallerReference": "2015-06-25-22:29:51",
+        "Config": {
+            "Comment": "ian-2015-06-25-22:29:51",
+            "PrivateZone": false
+        },
+        "Id": "/hostedzone/Z1G1BMM0B2FRF6",
+        "Name": "pradabestoutlet.pw."
+    },
+    "DelegationSet": {
+        "NameServers": [
+            "ns-384.awsdns-48.com",
+            "ns-1803.awsdns-33.co.uk",
+            "ns-555.awsdns-05.net",
+            "ns-1271.awsdns-30.org"
+        ]
+    },
+    "Location": "https://route53.amazonaws.com/2013-04-01/hostedzone/Z1G1BMM0B2FRF6",
+    "ChangeInfo": {
+        "Status": "PENDING",
+        "SubmittedAt": "2015-06-25T14:29:52.352Z",
+        "Id": "/change/C1EN7XNFQFBHWU"
+    }
+}
